@@ -33,7 +33,7 @@ const politicians = [
 
 const PoliticianCard = ({ politician, isTopRanked }) => (
   <div
-    className={`bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700 ${
+    className={`bg-white dark:bg-slate-800 rounded-xl fontroboto overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700 ${
       isTopRanked ? "md:col-span-2 lg:col-span-2" : ""
     }`}
   >
@@ -106,10 +106,10 @@ const TopPoliticians = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
+          <h2 className="text-4xl md:text-5xl font-mont font-bold text-slate-900 dark:text-white mb-4">
             Top Politicians
           </h2>
-          <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+          <p className="text-lg text-slate-600 fontroboto dark:text-slate-400 max-w-2xl mx-auto">
             Meet the most influential political leaders shaping our future
           </p>
         </div>

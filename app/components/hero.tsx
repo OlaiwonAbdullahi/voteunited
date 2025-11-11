@@ -7,7 +7,7 @@ import Image from "next/image";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden border-b border-border">
+    <section className="relative overflow-hidden border-b border-border fontroboto">
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="grid gap-12 md:grid-cols-2 md:gap-8 items-center">
           {/* Left Content */}
@@ -20,7 +20,7 @@ export default function Hero() {
             <p className="text-lg text-muted-foreground leading-relaxed">
               Stay informed, choose wisely, and let your voice be heard.{" "}
             </p>
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="flex flex-col gap-3 sm:flex-row fontroboto">
               <Button size="lg" asChild>
                 <Link href="/signup" className="gap-2">
                   Get Started
@@ -35,13 +35,12 @@ export default function Hero() {
 
           {/* Right Visual */}
           <div className=" h-80 rounded-xl border border-border  flex items-center justify-center">
-            <Image
+            <img
               src="/flag.png"
               alt="flag"
               width={24}
               height={34}
               className=" h-full w-full"
-              quality={100}
             />
           </div>
         </div>

@@ -10,7 +10,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-primary/20 font-robo bg-white text-[#0A3161] backdrop-blur">
+    <header className="sticky top-0 z-50 w-full border-b border-primary/20 fontroboto bg-white text-[#0A3161] backdrop-blur">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
