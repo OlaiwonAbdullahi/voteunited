@@ -16,7 +16,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 font-mont">
             <Image src="/flag.png" alt="flag" width={24} height={34} />
-            <span className="hidden text-xl font-bold text-primary sm:inline">
+            <span className=" text-xl font-bold text-primary sm:inline">
               Vote United
             </span>
           </Link>

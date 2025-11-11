@@ -120,7 +120,7 @@ const TopPoliticians = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-mont font-bold text-slate-900 dark:text-white mb-4">
+          <h2 className="text-4xl md:text-5xl font-mont font-bold text-primary dark:text-white mb-4">
             Top Politicians
           </h2>
           <p className="text-lg text-slate-600 fontroboto dark:text-slate-400 max-w-2xl mx-auto">
