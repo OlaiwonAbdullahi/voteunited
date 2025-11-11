@@ -21,13 +21,18 @@ export default function Hero() {
               Stay informed, choose wisely, and let your voice be heard.{" "}
             </p>
             <div className="flex flex-col gap-3 sm:flex-row fontroboto">
-              <Button size="lg" asChild>
+              <Button size="lg" asChild className=" shadow-none rounded-none">
                 <Link href="/signup" className="gap-2">
                   Get Started
                   <ArrowRight size={18} />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild>
+              <Button
+                size="lg"
+                variant="outline"
+                asChild
+                className=" shadow-none rounded-none border-primary"
+              >
                 <Link href="/politicians">Explore Politicians</Link>
               </Button>
             </div>
