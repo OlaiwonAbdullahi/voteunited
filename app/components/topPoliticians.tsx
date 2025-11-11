@@ -31,7 +31,21 @@ const politicians = [
   },
 ];
 
-const PoliticianCard = ({ politician, isTopRanked }) => (
+const PoliticianCard = ({
+  politician,
+  isTopRanked,
+}: {
+  politician: {
+    id: number;
+    name: string;
+    position: string;
+    image: string;
+    votes: string;
+    trending: boolean;
+    rank: number;
+  };
+  isTopRanked: boolean;
+}) => (
   <div
     className={`bg-white dark:bg-slate-800 rounded-xl fontroboto overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700 ${
       isTopRanked ? "md:col-span-2 lg:col-span-2" : ""
