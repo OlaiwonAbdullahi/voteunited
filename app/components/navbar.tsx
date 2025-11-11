@@ -30,7 +30,7 @@ export default function Navbar() {
               <Link href="/legislation">Legislation</Link>
             </Button>
             <Button variant="ghost" asChild className="text-base">
-              <Link href="/voting-places">Vote</Link>
+              <Link href="/vote">Vote</Link>
             </Button>
             <Button variant="ghost" asChild className="text-base">
               <Link href="/news">Resources</Link>
