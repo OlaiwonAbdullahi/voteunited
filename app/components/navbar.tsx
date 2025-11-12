@@ -26,7 +26,7 @@ export default function Navbar() {
             <Button variant="ghost" asChild className="text-base">
               <Link href="/politicians">Politicians</Link>
             </Button>
-            <Button variant="ghost" asChild className="text-base">
+            <Button variant="ghost" asChild className="text-base hidden">
               <Link href="/legislation">Legislation</Link>
             </Button>
             <Button variant="ghost" asChild className="text-base">
@@ -70,7 +70,11 @@ export default function Navbar() {
             <Button variant="ghost" className="w-full justify-start" asChild>
               <Link href="/politicians">Politicians</Link>
             </Button>
-            <Button variant="ghost" className="w-full justify-start" asChild>
+            <Button
+              variant="ghost"
+              className="hidden w-full justify-start"
+              asChild
+            >
               <Link href="/legislation">Legislation</Link>
             </Button>
             <Button variant="ghost" className="w-full justify-start" asChild>
