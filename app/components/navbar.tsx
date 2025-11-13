@@ -70,13 +70,7 @@ export default function Navbar() {
             <Button variant="ghost" className="w-full justify-start" asChild>
               <Link href="/politicians">Politicians</Link>
             </Button>
-            <Button
-              variant="ghost"
-              className="hidden w-full justify-start"
-              asChild
-            >
-              <Link href="/legislation">Legislation</Link>
-            </Button>
+
             <Button variant="ghost" className="w-full justify-start" asChild>
               <Link href="/vote">Vote</Link>
             </Button>

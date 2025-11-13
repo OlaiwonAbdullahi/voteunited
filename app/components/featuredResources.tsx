@@ -89,8 +89,8 @@ const FeaturedResources: React.FC = () => (
     </div>
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {SAMPLE_NEWS.map((article) => (
-        <Link key={article.id} href={`/news/${article.id}`} passHref>
-          <Card className="h-full py-0 fontroboto overflow-hidden hover:shadow-md transition-shadow flex flex-col">
+        <Link key={article.id} href={`/resources/${article.id}`} passHref>
+          <Card className="h-full rounded-none py-0 fontroboto overflow-hidden hover:shadow-md transition-shadow flex flex-col">
             {/* Image */}
             <div className="aspect-video bg-muted overflow-hidden">
               <img

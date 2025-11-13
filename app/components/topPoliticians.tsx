@@ -119,7 +119,7 @@ const PoliticianCard = ({
                 </span>
               </div>
 
-              <button className="w-full mt-4 px-6 py-3 bg-primary dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-slate-200 text-white dark:text-slate-900 font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 group">
+              <button className="w-full mt-4 px-6 py-3 bg-primary dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-slate-200 text-white dark:text-slate-900 font-semibold rounded-none transition-all duration-200 flex items-center justify-center gap-2 group">
                 View Profile
               </button>
             </div>

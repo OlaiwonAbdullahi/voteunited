@@ -3,6 +3,7 @@ import { Montserrat, Roboto } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/navbar";
 import Footer from "./components/footer";
+import LayoutClient from "./layoutClient";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -32,9 +33,7 @@ export default function RootLayout({
       <body
         className={`${montserrat.variable} ${roboto.variable} font-sans antialiased`}
       >
-        <Navbar />
-        {children}
-        <Footer />
+        <LayoutClient>{children}</LayoutClient>
       </body>
     </html>
   );

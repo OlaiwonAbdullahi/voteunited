@@ -233,8 +233,8 @@ export default function Resources() {
                           {featured.views.toLocaleString()} views
                         </span>
                       </div>
-                      <Button asChild>
-                        <Link href={`/news/${featured.id}`}>
+                      <Button asChild className=" rounded-none">
+                        <Link href={`/resources/${featured.id}`}>
                           Read Full Story
                         </Link>
                       </Button>
@@ -256,8 +256,8 @@ export default function Resources() {
         {/* News Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filteredNews.map((article) => (
-            <Link key={article.id} href={`/news/${article.id}`}>
-              <Card className="h-full py-0 fontroboto overflow-hidden hover:shadow-md transition-shadow flex flex-col">
+            <Link key={article.id} href={`/resources/${article.id}`}>
+              <Card className="h-full rounded-none py-0 fontroboto overflow-hidden hover:shadow-md transition-shadow flex flex-col">
                 {/* Image */}
                 <div className="aspect-video bg-muted overflow-hidden">
                   <img
