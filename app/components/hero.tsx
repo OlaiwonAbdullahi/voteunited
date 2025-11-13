@@ -22,7 +22,7 @@ export default function Hero() {
             </p>
             <div className="flex flex-col gap-3 sm:flex-row fontroboto">
               <Button size="lg" asChild className=" shadow-none rounded-none">
-                <Link href="/signup" className="gap-2">
+                <Link href="/vote" className="gap-2">
                   Get Started
                   <ArrowRight size={18} />
                 </Link>

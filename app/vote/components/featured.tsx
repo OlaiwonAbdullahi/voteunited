@@ -73,7 +73,7 @@ const Featured = () => {
                   className="md:basis-1/2 lg:basis-1/3 pl-2"
                 >
                   <div className="p-1">
-                    <Card className="relative overflow-hidden h-[280px] border-border hover:shadow-lg transition-shadow duration-300 hover:border-primary/30 ">
+                    <Card className="relative rounded-none overflow-hidden h-[280px] border-border hover:shadow-lg transition-shadow duration-300 hover:border-primary/30 ">
                       <CardContent className="p-0 h-full">
                         <div
                           className="absolute inset-0 bg-cover bg-center"

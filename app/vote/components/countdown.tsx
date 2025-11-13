@@ -7,7 +7,7 @@ export default function Timer() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 pt-16 sm:px-6 lg:px-8">
-      <Card className="border-border p-0 py-4">
+      <Card className="border-border p-0 py-4 rounded-none">
         <CardContent className="px-4 pb-2">
           <h3 className="text-3xl md:text-4xl fontmont font-semibold  mb-4 text-center text-primary">
             Voting closes in
@@ -21,7 +21,7 @@ export default function Timer() {
               } else {
                 return (
                   <div className="grid grid-cols-4 gap-2">
-                    <div className="rounded-md border border-border bg-card p-3 text-center">
+                    <div className="rounded-none border border-border bg-card p-3 text-center">
                       <div className="text-2xl font-bold text-primary">
                         {days}
                       </div>
@@ -29,7 +29,7 @@ export default function Timer() {
                         Days
                       </div>
                     </div>
-                    <div className="rounded-md border border-border bg-card p-3 text-center">
+                    <div className="rounded-none border border-border bg-card p-3 text-center">
                       <div className="text-2xl font-bold text-primary">
                         {hours}
                       </div>
@@ -37,7 +37,7 @@ export default function Timer() {
                         Hours
                       </div>
                     </div>
-                    <div className="rounded-md border border-border bg-card p-3 text-center">
+                    <div className="rounded-none border border-border bg-card p-3 text-center">
                       <div className="text-2xl font-bold text-primary">
                         {minutes}
                       </div>
@@ -45,7 +45,7 @@ export default function Timer() {
                         Minutes
                       </div>
                     </div>
-                    <div className="rounded-md border border-border bg-card p-3 text-center">
+                    <div className="rounded-none border border-border bg-card p-3 text-center">
                       <div className="text-2xl font-bold text-primary">
                         {seconds}
                       </div>

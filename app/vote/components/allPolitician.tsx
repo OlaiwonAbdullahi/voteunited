@@ -51,7 +51,7 @@ const AllPolitician = () => {
         {politicians.map((politician) => (
           <Card
             key={politician.id}
-            className="relative overflow-hidden h-[280px] border-border hover:shadow-lg transition-shadow duration-300 hover:border-primary/30"
+            className="relative overflow-hidden rounded-none h-[280px] border-border hover:shadow-lg transition-shadow duration-300 hover:border-primary/30"
           >
             <CardContent className="p-0 h-full">
               <div
