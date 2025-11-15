@@ -58,7 +58,7 @@ const PoliticianCard = ({
   isTopRanked: boolean;
 }) => (
   <Dialog>
-    <DialogTrigger asChild>
+    <DialogTrigger asChild className=" rounded-none">
       <div
         className={`bg-white dark:bg-slate-800 rounded-none mb-4 fontroboto overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700 ${
           isTopRanked ? "md:col-span-2 lg:col-span-2" : ""
@@ -128,7 +128,7 @@ const PoliticianCard = ({
         </div>
       </div>
     </DialogTrigger>
-    <DialogContent className="sm:max-w-xl">
+    <DialogContent className="sm:max-w-xl rounded-none">
       <DialogHeader>
         <DialogTitle className="fontmont">{politician.name}</DialogTitle>
         <DialogDescription className="fontroboto">
@@ -136,7 +136,7 @@ const PoliticianCard = ({
         </DialogDescription>
       </DialogHeader>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="rounded-md border border-border overflow-hidden">
+        <div className="rounded-none border border-border overflow-hidden">
           <img
             src={politician.image}
             alt={politician.name}

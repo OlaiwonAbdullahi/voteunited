@@ -124,7 +124,7 @@ const PoliticianCard = ({
         </DialogDescription>
       </DialogHeader>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="rounded-md border border-border overflow-hidden">
+        <div className="rounded-none border border-border overflow-hidden">
           <img
             src={politician.image}
             alt={politician.name}

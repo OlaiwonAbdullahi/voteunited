@@ -1,3 +1,4 @@
+import { Marquee } from "@/components/ui/marquee";
 import Image from "next/image";
 
 const logos = [
@@ -22,23 +23,24 @@ const Partners = () => {
             </p>
           </div>
         </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
-          {logos.map((logo) => (
-            <div
-              key={logo.name}
-              className="group flex items-center justify-center rounded-md  p-6 transition-colors "
-            >
-              <Image
-                src={logo.src}
-                alt={`${logo.name} logo`}
-                width={120}
-                height={40}
-                className="h-10 w-auto opacity-70 transition-opacity group-hover:opacity-100"
-              />
-            </div>
-          ))}
-        </div>
+        <Marquee pauseOnHover className="[--duration:20s]">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+            {logos.map((logo) => (
+              <div
+                key={logo.name}
+                className="group flex items-center justify-center rounded-md  p-6 transition-colors "
+              >
+                <Image
+                  src={logo.src}
+                  alt={`${logo.name} logo`}
+                  width={120}
+                  height={40}
+                  className="h-10 w-auto opacity-70 transition-opacity group-hover:opacity-100"
+                />
+              </div>
+            ))}
+          </div>
+        </Marquee>
       </div>
     </section>
   );
