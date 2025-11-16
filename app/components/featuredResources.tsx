@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-// Free NewsAPI.org key - sign up at https://newsapi.org
-const NEWS_API_KEY = "b4bc294c49c141858a09aa3cebfccada"; // Replace with your key
+
+const NEWS_API_KEY = "b4bc294c49c141858a09aa3cebfccada"; 
 const NEWS_API_ENDPOINT = "https://newsapi.org/v2/everything";
 
 type CategoryType =
