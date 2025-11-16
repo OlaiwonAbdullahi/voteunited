@@ -8,9 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Search, TrendingUp, Calendar, Eye, Loader2, AlertCircle, ExternalLink } from "lucide-react";
 
-
-const NEWS_API_KEY = "b4bc294c49c141858a09aa3cebfccada"; 
-const NEWS_API_ENDPOINT = "https://newsapi.org/v2/everything";
+// --- GNews.io Configuration ---
+// NOTE: Ensure your key is valid for gnews.io. The key format matches GNews (32 hex characters).
+const NEWS_API_KEY = "8c084f518b8b23d615fc2925e8269cf6"; 
+const NEWS_API_ENDPOINT = "https://gnews.io/api/v4/search";
 
 interface NewsArticle {
   id: string;
@@ -44,7 +45,7 @@ export default function Resources() {
       setLoading(true);
       setError(null);
 
-      // Fetch US political news from NewsAPI
+      // Fetch US political news from GNews.io
       const topics = [
         "US election 2024",
         "US politics",
@@ -55,8 +56,9 @@ export default function Resources() {
       
       const randomTopic = topics[Math.floor(Math.random() * topics.length)];
       
+      // Use GNews.io endpoint
       const response = await fetch(
-        `${NEWS_API_ENDPOINT}?q=${encodeURIComponent(randomTopic)}&language=en&sortBy=publishedAt&pageSize=50&apiKey=${NEWS_API_KEY}`
+        `${NEWS_API_ENDPOINT}?q=${encodeURIComponent(randomTopic)}&language=en&country=us&max=50&apikey=${NEWS_API_KEY}`
       );
 
       if (!response.ok) {
@@ -66,14 +68,16 @@ export default function Resources() {
       const data = await response.json();
 
       if (data.status === "error") {
-        throw new Error(data.message || "Failed to fetch news");
+        // GNews errors include "errors" property or a message string
+        throw new Error(data.message || data.errors?.[0] || "Failed to fetch news from GNews");
       }
 
+      // GNews returns "articles" property
       if (!data.articles || data.articles.length === 0) {
-        throw new Error("No articles returned from API");
+        throw new Error("No articles returned from API. The query might be too specific or the API limit reached.");
       }
 
-      // Transform NewsAPI data to our article format
+      // Transform GNews data to our article format
       const transformedArticles: NewsArticle[] = data.articles.map((article: any, index: number) => {
         // Determine category based on content
         let category: NewsArticle['category'] = "Politics";
@@ -93,15 +97,19 @@ export default function Resources() {
         return {
           id: article.url || `article-${index}`,
           title: article.title || "Untitled Article",
-          summary: article.description || article.content?.substring(0, 150) + "..." || "No description available",
-          content: article.content || article.description || "Full content not available. Visit source link to read more.",
+          // GNews.io uses 'description' for a summary
+          summary: article.description || "No description available", 
+          content: article.description || "Full content not available. Visit source link to read more.", // Use description as content fallback
           category: category,
+          // GNews.io uses 'publishedAt'
           date: article.publishedAt?.split('T')[0] || new Date().toISOString().split('T')[0],
-          author: article.author || article.source?.name || "Unknown Author",
+          // GNews.io uses 'source.name' and 'source.url'
+          author: article.source?.name || "Unknown Author", 
           views: Math.floor(Math.random() * 50000 + 5000),
           trending: index < 8, // First 8 are trending (most recent)
           relatedPoliticians: [],
-          image: article.urlToImage || "/flag.png",
+          // GNews.io uses 'image'
+          image: article.image || "/flag.png",
           url: article.url,
           source: article.source?.name
         };
@@ -141,13 +149,12 @@ export default function Resources() {
       case "Politics":
         return "bg-primary/10 text-primary";
       case "Legislation":
+      case "Policy":
         return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400";
       case "Elections":
         return "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400";
       case "Opinion":
         return "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400";
-      case "Policy":
-        return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
       default:
         return "bg-muted text-muted-foreground";
     }
@@ -183,12 +190,12 @@ export default function Resources() {
               </p>
               <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800 text-left">
                 <p className="text-sm text-blue-800 dark:text-blue-200 mb-2">
-                  <strong>Setup Instructions:</strong>
+                  <strong>Setup Instructions for GNews.io:</strong>
                 </p>
                 <ol className="text-xs text-blue-700 dark:text-blue-300 space-y-1 list-decimal list-inside">
-                  <li>Sign up for a free API key at: <a href="https://newsapi.org/register" target="_blank" className="underline">newsapi.org/register</a></li>
-                  <li>Replace YOUR_NEWSAPI_KEY_HERE with your actual key</li>
-                  <li>Free tier: 100 requests/day, updated articles</li>
+                  <li>Sign up for a free API key at: <a href="https://gnews.io/" target="_blank" className="underline">gnews.io</a></li>
+                  <li>Replace YOUR_GNEWS_API_KEY_HERE with your actual key in the `NEWS_API_KEY` constant.</li>
+                  <li>Free tier: 100 requests/day.</li>
                 </ol>
               </div>
               <Button onClick={fetchPoliticalNews} className="mt-4 rounded-none">
@@ -252,6 +259,7 @@ export default function Resources() {
         {filteredNews.some((a) => a.trending) && (
           <div className="mb-12">
             {(() => {
+              // Ensure the featured article exists in the filtered list
               const featured = filteredNews.find((a) => a.trending);
               if (!featured) return null;
               return (

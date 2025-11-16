@@ -7,9 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-
-const NEWS_API_KEY = "b4bc294c49c141858a09aa3cebfccada"; 
-const NEWS_API_ENDPOINT = "https://newsapi.org/v2/everything";
+// Using FREE GNews API - sign up at https://gnews.io/
+const GNEWS_API_KEY = "8c084f518b8b23d615fc2925e8269cf6"; // Replace with your key
+const GNEWS_ENDPOINT = "https://gnews.io/api/v4/search";
 
 type CategoryType =
   | "Politics"
@@ -66,9 +66,10 @@ const FeaturedResources: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      // Fetch featured US political news from NewsAPI
+      // Fetch featured US political news from GNews (100% FREE, works in browser)
+      const query = "US election 2024 OR politics";
       const response = await fetch(
-        `${NEWS_API_ENDPOINT}?q=US+election+2024+OR+politics&language=en&sortBy=popularity&pageSize=6&apiKey=${NEWS_API_KEY}`
+        `${GNEWS_ENDPOINT}?q=${encodeURIComponent(query)}&lang=en&country=us&max=6&apikey=${GNEWS_API_KEY}`
       );
 
       if (!response.ok) {
@@ -77,15 +78,15 @@ const FeaturedResources: React.FC = () => {
 
       const data = await response.json();
 
-      if (data.status === "error") {
-        throw new Error(data.message || "Failed to fetch news");
+      if (data.errors) {
+        throw new Error(data.errors[0] || "Failed to fetch news");
       }
 
       if (!data.articles || data.articles.length === 0) {
         throw new Error("No articles returned from API");
       }
 
-      // Transform NewsAPI data to our article format
+      // Transform GNews data to our article format
       const transformedArticles: NewsArticle[] = data.articles.slice(0, 6).map((article: any, index: number) => {
         // Determine category based on content
         let category: CategoryType = "Politics";
@@ -105,15 +106,15 @@ const FeaturedResources: React.FC = () => {
         return {
           id: article.url || `article-${index}`,
           title: article.title || "Untitled Article",
-          summary: article.description || article.content?.substring(0, 150) + "..." || "No description available",
+          summary: article.description || article.content?.substring(0, 200) + "..." || "No description available",
           content: article.content || article.description || "Full content not available.",
           category: category,
           date: article.publishedAt?.split('T')[0] || new Date().toISOString().split('T')[0],
-          author: article.author || article.source?.name || "Unknown Author",
+          author: article.source?.name || "Unknown Source",
           views: Math.floor(Math.random() * 50000 + 5000),
           trending: index < 3, // First 3 are trending
           relatedPoliticians: [],
-          image: article.urlToImage || "/flag.png",
+          image: article.image || "/flag.png",
           url: article.url,
           source: article.source?.name
         };
@@ -175,12 +176,13 @@ const FeaturedResources: React.FC = () => {
             </p>
             <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800 text-left mb-4">
               <p className="text-sm text-blue-800 dark:text-blue-200 mb-2">
-                <strong>Setup Instructions:</strong>
+                <strong>Setup Instructions (100% FREE):</strong>
               </p>
               <ol className="text-xs text-blue-700 dark:text-blue-300 space-y-1 list-decimal list-inside">
-                <li>Sign up for a free API key at: <a href="https://newsapi.org/register" target="_blank" className="underline">newsapi.org/register</a></li>
-                <li>Replace YOUR_NEWSAPI_KEY_HERE with your actual key</li>
-                <li>Free tier: 100 requests/day</li>
+                <li>Sign up FREE at: <a href="https://gnews.io/" target="_blank" className="underline">gnews.io</a></li>
+                <li>Get your FREE API key instantly (no credit card)</li>
+                <li>Replace YOUR_GNEWS_API_KEY_HERE in code</li>
+                <li>Free: 100 requests/day, works in browser!</li>
               </ol>
             </div>
             <Button onClick={fetchFeaturedNews} className="rounded-none">
