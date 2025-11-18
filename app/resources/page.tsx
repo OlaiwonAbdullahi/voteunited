@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -63,8 +64,11 @@ export default function Resources() {
       ];
 
       const randomTopic = topics[Math.floor(Math.random() * topics.length)];
-
-      // Use GNews.io endpoint
+      console.log(
+        `${NEWS_API_ENDPOINT}?q=${encodeURIComponent(
+          randomTopic
+        )}&language=en&country=us&max=50&apikey=${NEWS_API_KEY}`
+      );
       const response = await fetch(
         `${NEWS_API_ENDPOINT}?q=${encodeURIComponent(
           randomTopic
