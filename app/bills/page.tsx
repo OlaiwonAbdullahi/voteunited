@@ -337,7 +337,7 @@ export default function CongressionalBills() {
 
                     <Button asChild className="rounded-none">
                       <a
-                        href={`http://localhost:3000/bill?congress=${featured.congress}&billType=${featured.type}&billNumber=${featured.number}`}
+                        href={`https://voteunited.vercel.app/bill?congress=${featured.congress}&billType=${featured.type}&billNumber=${featured.number}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="gap-2"
@@ -423,7 +423,7 @@ export default function CongressionalBills() {
                     variant="outline"
                   >
                     <a
-                      href={`http://localhost:3000/bill?congress=${bill.congress}&billType=${bill.type}&billNumber=${bill.number}`}
+                      href={`https://voteunited.vercel.app/bill?congress=${bill.congress}&billType=${bill.type}&billNumber=${bill.number}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="gap-2"
