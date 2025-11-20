@@ -54,16 +54,16 @@ const Page = () => {
       }
 
       const data = await response.json();
+      console.log("API RESPONSE:", data);
 
-      if (
-        !data.members ||
-        !data.members.data ||
-        data.members.data.length === 0
-      ) {
-        throw new Error("No members data returned from API");
+      // 🛠 FIX: members is a direct array, not nested under data
+      const members = data?.members || [];
+
+      if (!Array.isArray(members)) {
+        throw new Error("Members data is not an array");
       }
 
-      const processedData = data.members.data.map(normalizePolitician);
+      const processedData = data.members.map(normalizePolitician);
       setPoliticians(processedData);
     } catch (err) {
       console.error("Error fetching Congress members:", err);

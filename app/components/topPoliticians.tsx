@@ -26,20 +26,17 @@ const PoliticianCard = ({
   <Dialog>
     <DialogTrigger asChild className="rounded-none">
       <div
-        className={`bg-white dark:bg-slate-800 rounded-none mb-4 fontroboto overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700 cursor-pointer ${
-          isTopRanked ? "md:col-span-2 lg:col-span-2" : ""
-        }`}
+        className={`bg-white dark:bg-slate-800 rounded-none mb-4 fontroboto overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700 cursor-pointer ${isTopRanked ? "md:col-span-2 lg:col-span-2" : ""
+          }`}
       >
         <div
-          className={`grid ${
-            isTopRanked ? "md:grid-cols-2" : "grid-cols-1"
-          } h-full`}
+          className={`grid ${isTopRanked ? "md:grid-cols-2" : "grid-cols-1"
+            } h-full`}
         >
           {/* Image Section */}
           <div
-            className={`relative ${
-              isTopRanked ? "h-full min-h-[300px]" : "h-64"
-            }  from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 overflow-hidden`}
+            className={`relative ${isTopRanked ? "h-full min-h-[300px]" : "h-64"
+              }  from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 overflow-hidden`}
           >
             <img
               src={politician.image}
@@ -64,16 +61,14 @@ const PoliticianCard = ({
 
           {/* Content Section */}
           <div
-            className={`p-6 ${
-              isTopRanked ? "flex flex-col justify-center" : ""
-            }`}
+            className={`p-6 ${isTopRanked ? "flex flex-col justify-center" : ""
+              }`}
           >
             <div className="space-y-4">
               <div>
                 <h3
-                  className={`font-bold text-slate-900 dark:text-white mb-1 ${
-                    isTopRanked ? "text-3xl" : "text-xl"
-                  }`}
+                  className={`font-bold text-slate-900 dark:text-white mb-1 ${isTopRanked ? "text-3xl" : "text-xl"
+                    }`}
                 >
                   {politician.name}
                 </h3>
@@ -195,62 +190,62 @@ const TopPoliticians = () => {
     fetchTopPoliticians();
   }, []);
 
-const fetchTopPoliticians = async () => {
-  try {
-    setLoading(true);
-    setError(null);
+  const fetchTopPoliticians = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-    const response = await fetch("https://voteunited.buyjet.ng/api/members");
+      const response = await fetch("https://voteunited.buyjet.ng/api/members");
 
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("API RESPONSE:", data);
+
+      // 🛠 FIX: Correct members array location
+      const members = data?.members || [];
+
+      if (!Array.isArray(members)) {
+        throw new Error("Members data is not an array");
+      }
+
+      // 🎯 Get only top 5 members
+      const transformedPoliticians: Politician[] = members
+        .slice(0, 5)
+        .map((member: any, index: number) => {
+          const latestTerm = member.terms?.[0];
+
+          let position = "Member of Congress";
+          if (latestTerm?.chamber === "Senate") {
+            position = "U.S. Senator";
+          } else if (latestTerm?.chamber === "House of Representatives") {
+            position = "U.S. Representative";
+          }
+
+          return {
+            id: member.external_id,
+            name: member.name,
+            position,
+            image: member.image_url,
+            party: member.party,
+            state: member.state,
+            votes: member.votes_count?.toLocaleString() || "0",
+            trending: Math.random() > 0.7,
+            rank: index + 1,
+            bio: member.source_url ? `Source: ${member.source_url}` : "",
+          };
+        });
+
+      setPoliticians(transformedPoliticians);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-
-    const data = await response.json();
-    console.log("API RESPONSE:", data);
-
-    // 🛠 FIX: Correct members array location
-    const members = data?.members?.data || [];
-
-    if (!Array.isArray(members)) {
-      throw new Error("Members data is not an array");
-    }
-
-    // 🎯 Get only top 5 members
-    const transformedPoliticians: Politician[] = members
-      .slice(0, 5)
-      .map((member: any, index: number) => {
-        const latestTerm = member.terms?.[0];
-
-        let position = "Member of Congress";
-        if (latestTerm?.chamber === "Senate") {
-          position = "U.S. Senator";
-        } else if (latestTerm?.chamber === "House of Representatives") {
-          position = "U.S. Representative";
-        }
-
-        return {
-          id: member.external_id,
-          name: member.name,
-          position,
-          image: member.image_url,
-          party: member.party,
-          state: member.state,
-          votes: member.votes_count?.toLocaleString() || "0",
-          trending: Math.random() > 0.7,
-          rank: index + 1,
-          bio: member.source_url ? `Source: ${member.source_url}` : "",
-        };
-      });
-
-    setPoliticians(transformedPoliticians);
-  } catch (err: any) {
-    console.error(err);
-    setError(err.message);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   if (loading) {
     return (

@@ -187,7 +187,6 @@ const fetchCongressMembers = async () => {
   try {
     setLoading(true);
     setError(null);
-
     const response = await fetch("https://voteunited.buyjet.ng/api/members");
 
     if (!response.ok) {
@@ -197,8 +196,8 @@ const fetchCongressMembers = async () => {
     const data = await response.json();
     console.log("API RESPONSE:", data);
 
-    // 🛠 FIX: Correct members array location
-    const members = data?.members?.data || [];
+    // 🛠 FIX: members is a direct array, not nested under data
+    const members = data?.members || [];
 
     if (!Array.isArray(members)) {
       throw new Error("Members data is not an array");
@@ -222,6 +221,7 @@ const fetchCongressMembers = async () => {
           image: member.image_url,
           party: member.party,
           state: member.state,
+          district: member.district, // Added district field
           votes: member.votes_count?.toLocaleString() || "0",
           trending: Math.random() > 0.7,
           rank: index + 1,
