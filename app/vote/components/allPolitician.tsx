@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
+import { upvoteMember } from "@/lib/api";
 
 // Type definitions
 interface Politician {
@@ -41,10 +42,12 @@ interface VoteResponse {
 type VoteType = "up" | "down";
 
 const AllPolitician = ({ politicians = [] }: AllPoliticianProps) => {
+  const [items, setItems] = useState(politicians);
   const [ip, setIp] = useState<string | null>(null);
   const [selectedPolitician, setSelectedPolitician] =
     useState<Politician | null>(null);
   const [list, setList] = useState<Politician[]>(politicians);
+  const [loadingId, setLoadingId] = useState<string | number | null>(null);
 
   // keep local list in sync if the prop changes
   useEffect(() => {
@@ -67,68 +70,22 @@ const AllPolitician = ({ politicians = [] }: AllPoliticianProps) => {
   }, []);
 
   // central vote handler
-  const handleVote = async (
-    politician: Politician,
-    type: VoteType = "up"
-  ): Promise<void> => {
-    if (!politician?.id) return;
-
-    // optimistic update
-    setList((prev) =>
-      prev.map((p) =>
-        p.id === politician.id
-          ? {
-              ...p,
-              votes:
-                type === "up"
-                  ? (Number(p.votes) || 0) + 1
-                  : Math.max((Number(p.votes) || 0) - 1, 0),
-            }
-          : p
-      )
-    );
-
+  const handleUpvote = async (id: string | number) => {
     try {
-      const endpoint =
-        type === "up"
-          ? "https://cors-anywhere.herokuapp.com/https://voteunited.buyjet.ng/api/upvote-member"
-          : "https://voteunited.buyjet.ng/api/downvote-member";
+      setLoadingId(id);
 
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ip,
-          memberId: politician.id,
-        }),
-      });
+      const res = await upvoteMember(id);
 
-      if (!res.ok) {
-        const text = await res.text().catch(() => null);
-        throw new Error(
-          `Vote request failed: ${res.status} ${res.statusText} ${text ?? ""}`
-        );
-      }
-      const data: VoteResponse = await res.json();
-      console.log("Vote response:", data);
-
-      // Optionally: synchronize the server-provided vote count if returned
-    } catch (error) {
-      console.error("Error voting:", error);
-      // revert optimistic update on error
-      setList((prev) =>
-        prev.map((p) =>
-          p.id === politician.id
-            ? {
-                ...p,
-                votes:
-                  type === "up"
-                    ? Math.max((Number(p.votes) || 0) - 1, 0)
-                    : (Number(p.votes) || 0) + 1,
-              }
-            : p
+      // Assuming API returns success
+      setItems((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, votes: item.votes + 1 } : item
         )
       );
+    } catch (err) {
+      console.error("Vote failed:", err);
+    } finally {
+      setLoadingId(null);
     }
   };
 
@@ -189,15 +146,20 @@ const AllPolitician = ({ politicians = [] }: AllPoliticianProps) => {
                     <div className="flex gap-2 items-center">
                       <Button
                         aria-label={`Upvote ${politician.name}`}
-                        onClick={() => handleVote(politician, "up")}
                         className="text-primary hover:bg-primary/90 border border-primary bg-transparent rounded-none"
                         variant="outline"
+                        disabled={loadingId === politician.id}
+                        onClick={() => handleUpvote(politician.id)}
                       >
-                        <ThumbsUp className="w-6 h-6" />
+                        {loadingId === politician.id ? (
+                          <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+                        ) : (
+                          <ThumbsUp className="w-10 h-10" />
+                        )}
                       </Button>
                       <Button
                         aria-label={`Downvote ${politician.name}`}
-                        onClick={() => handleVote(politician, "down")}
+
                         className="text-primary hover:bg-primary/90 border border-primary rounded-none bg-transparent"
                         variant="outline"
                       >
@@ -248,29 +210,30 @@ const AllPolitician = ({ politicians = [] }: AllPoliticianProps) => {
                         </div>
                         {(selectedPolitician?.trending ??
                           politician.trending) && (
-                          <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1 text-sm text-secondary-foreground">
-                            <TrendingUp size={14} /> Trending
-                          </div>
-                        )}
+                            <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1 text-sm text-secondary-foreground">
+                              <TrendingUp size={14} /> Trending
+                            </div>
+                          )}
                       </div>
                     </div>
                     <DialogFooter>
                       <div className="flex gap-2 items-center">
                         <Button
-                          aria-label={`Upvote ${politician.name} from modal`}
-                          onClick={() =>
-                            handleVote(selectedPolitician ?? politician, "up")
-                          }
+                          aria-label={`Upvote ${politician.name}`}
                           className="text-primary hover:bg-primary/90 border border-primary bg-transparent rounded-none"
                           variant="outline"
+                          disabled={loadingId === politician.id}
+                          onClick={() => handleUpvote(politician.id)}
                         >
-                          <ThumbsUp className="w-6 h-6" />
+                          {loadingId === politician.id ? (
+                            <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+                          ) : (
+                            <ThumbsUp className="w-10 h-10" />
+                          )}
                         </Button>
                         <Button
                           aria-label={`Downvote ${politician.name} from modal`}
-                          onClick={() =>
-                            handleVote(selectedPolitician ?? politician, "down")
-                          }
+                         
                           className="text-primary hover:bg-primary/90 border border-primary rounded-none bg-transparent"
                           variant="outline"
                         >

@@ -134,8 +134,14 @@ const Featured = ({ politicians }: FeaturedProps) => {
                                   aria-label={`Upvote ${politician.name}`}
                                   className="text-primary hover:bg-primary/90 border border-primary bg-transparent rounded-none"
                                   variant="outline"
+                                  disabled={loadingId === politician.id}
+                                  onClick={() => handleUpvote(politician.id)}
                                 >
-                                  <ThumbsUp className="w-10 h-10" />
+                                  {loadingId === politician.id ? (
+                                    <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+                                  ) : (
+                                    <ThumbsUp className="w-10 h-10" />
+                                  )}
                                 </Button>
                                 <Button
                                   aria-label={`Downvote ${politician.name}`}
