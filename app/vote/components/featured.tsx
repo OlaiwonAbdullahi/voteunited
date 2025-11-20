@@ -104,9 +104,9 @@ const Featured = ({ politicians }: FeaturedProps) => {
                             <Badge className="rounded-full px-3 py-1 text-xs bg-red-600 text-white">
                               #{politician.rank}
                             </Badge>
-                            <div className="text-white/90 bg-primary backdrop-blur-sm px-3 py-1 rounded-full text-xs">
+                            {/* <div className="text-white/90 bg-primary backdrop-blur-sm px-3 py-1 rounded-full text-xs">
                               {politician.votes} votes
-                            </div>
+                            </div> */}
                           </div>
 
                           <div className="flex-1 p-4 flex flex-col justify-between text-white">
@@ -121,18 +121,18 @@ const Featured = ({ politicians }: FeaturedProps) => {
                               </p>
                             </div>
                             <div className="flex items-center justify-between pb-2">
-                              <div>
+                              {/* <div>
                                 <p className="text-lg font-bold text-white flex gap-1 items-center fontmont">
                                   {politician.votes}
                                   <span className="text-xs text-white fontroboto">
                                     Votes
                                   </span>
                                 </p>
-                              </div>
+                              </div> */}
                               <div className="flex gap-2 items-center">
                                 <Button
                                   aria-label={`Upvote ${politician.name}`}
-                                  className="text-primary hover:bg-primary/90 border border-primary bg-transparent rounded-none"
+                                  className="text-primary hover:bg-primary/90 border border-primary bg-white rounded-none"
                                   variant="outline"
                                   disabled={loadingId === politician.id}
                                   onClick={() => handleUpvote(politician.id)}
@@ -145,7 +145,7 @@ const Featured = ({ politicians }: FeaturedProps) => {
                                 </Button>
                                 <Button
                                   aria-label={`Downvote ${politician.name}`}
-                                  className="text-primary hover:bg-primary/90 border border-primary rounded-none bg-transparent"
+                                  className="text-primary hover:bg-primary/90 border border-primary rounded-none bg-red-100"
                                   variant="outline"
                                 >
                                   <ThumbsDown className="w-10 h-10" />
@@ -184,12 +184,12 @@ const Featured = ({ politicians }: FeaturedProps) => {
                                   <div className="text-lg font-semibold text-foreground">
                                     #{politician.rank}
                                   </div>
-                                  <div className="text-sm text-muted-foreground fontroboto">
+                                  {/* <div className="text-sm text-muted-foreground fontroboto">
                                     Votes
                                   </div>
                                   <div className="text-lg font-semibold text-primary fontmont">
                                     {politician.votes}
-                                  </div>
+                                  </div> */}
                                   {politician.trending && (
                                     <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1 text-sm text-secondary-foreground">
                                       <TrendingUp size={14} /> Trending
