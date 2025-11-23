@@ -2,7 +2,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ThumbsDown, ThumbsUp, TrendingUp } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ThumbsDown, ThumbsUp, TrendingUp, Search } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -49,6 +50,7 @@ const AllPolitician = ({ politicians = [] }: AllPoliticianProps) => {
     useState<Politician | null>(null);
   const [list, setList] = useState<Politician[]>(politicians);
   const [loadingId, setLoadingId] = useState<string | number | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   // keep local list in sync if the prop changes
   useEffect(() => {
@@ -70,30 +72,39 @@ const AllPolitician = ({ politicians = [] }: AllPoliticianProps) => {
     fetchIp();
   }, []);
 
-const handleUpvote = async (id: string | number) => {
-  try {
-    setLoadingId(id);
+  const handleUpvote = async (id: string | number) => {
+    try {
+      setLoadingId(id);
 
-    const res = await upvoteMember(id);
+      const res = await upvoteMember(id);
 
-    if (res?.success) {
-      setItems((prev) =>
-        prev.map((item) =>
-          item.id === id ? { ...item, votes: item.votes + 1 } : item
-        )
-      );
+      if (res?.success) {
+        setItems((prev) =>
+          prev.map((item) =>
+            item.id === id ? { ...item, votes: item.votes + 1 } : item
+          )
+        );
 
-      toast.success("Vote successful! 🎉");
-    } else {
-      toast.error(res?.message || "You already voted ❌");
+        toast.success("Vote successful! 🎉");
+      } else {
+        toast.error(res?.message || "You already voted ❌");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong ❌");
+    } finally {
+      setLoadingId(null);
     }
-  } catch (err) {
-    console.error(err);
-    toast.error("Something went wrong ❌");
-  } finally {
-    setLoadingId(null);
-  }
-};
+  };
+
+  // Filter politicians based on search term
+  const filteredPoliticians = list.filter((politician) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      politician.name.toLowerCase().includes(searchLower) ||
+      politician.position.toLowerCase().includes(searchLower)
+    );
+  });
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
@@ -108,8 +119,28 @@ const handleUpvote = async (id: string | number) => {
         </div>
       </div>
 
+      {/* Search Bar */}
+      <div className="mb-8">
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search by name or position..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 rounded-none"
+          />
+        </div>
+        {searchTerm && (
+          <p className="mt-2 text-sm text-muted-foreground">
+            Found {filteredPoliticians.length} politician
+            {filteredPoliticians.length !== 1 ? "s" : ""}
+          </p>
+        )}
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {list.map((politician) => (
+        {filteredPoliticians.map((politician) => (
           <Card
             key={politician.id}
             className="relative overflow-hidden rounded-none h-[280px] border-border hover:shadow-lg transition-shadow duration-300 hover:border-primary/30"
@@ -126,9 +157,6 @@ const handleUpvote = async (id: string | number) => {
                   <Badge className="rounded-full px-3 py-1 text-xs bg-secondary text-white">
                     #{politician.rank}
                   </Badge>
-                  {/* <div className="text-white/90 bg-black/40 backdrop-blur-sm px-3 py-1 rounded-full text-xs">
-                    {politician.votes} votes
-                  </div> */}
                 </div>
 
                 <div className="flex-1 flex flex-col justify-end text-white">
@@ -141,14 +169,6 @@ const handleUpvote = async (id: string | number) => {
                     </p>
                   </div>
                   <div className="flex items-center justify-between pb-2">
-                    {/* <div className="flex items-end gap-2">
-                      <span className="text-lg font-bold text-white fontmont">
-                        {politician.votes}
-                      </span>
-                      <span className="text-xs text-white/80 fontroboto">
-                        Votes
-                      </span>
-                    </div> */}
                     <div className="flex gap-2 items-center">
                       <Button
                         aria-label={`Upvote ${politician.name}`}
@@ -165,7 +185,6 @@ const handleUpvote = async (id: string | number) => {
                       </Button>
                       <Button
                         aria-label={`Downvote ${politician.name}`}
-
                         className="text-primary hover:bg-primary/90 border border-primary rounded-none bg-red-100"
                         variant="outline"
                       >
@@ -208,18 +227,12 @@ const handleUpvote = async (id: string | number) => {
                         <div className="text-lg font-semibold text-foreground">
                           #{selectedPolitician?.rank ?? politician.rank}
                         </div>
-                        {/* <div className="text-sm text-muted-foreground fontroboto">
-                          Votes
-                        </div>
-                        <div className="text-lg font-semibold text-primary fontmont">
-                          {selectedPolitician?.votes ?? politician.votes}
-                        </div> */}
                         {(selectedPolitician?.trending ??
                           politician.trending) && (
-                            <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1 text-sm text-secondary-foreground">
-                              <TrendingUp size={14} /> Trending
-                            </div>
-                          )}
+                          <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1 text-sm text-secondary-foreground">
+                            <TrendingUp size={14} /> Trending
+                          </div>
+                        )}
                       </div>
                     </div>
                     <DialogFooter>
@@ -239,7 +252,6 @@ const handleUpvote = async (id: string | number) => {
                         </Button>
                         <Button
                           aria-label={`Downvote ${politician.name} from modal`}
-                         
                           className="text-primary hover:bg-primary/90 border border-primary rounded-none bg-transparent"
                           variant="outline"
                         >
@@ -254,6 +266,15 @@ const handleUpvote = async (id: string | number) => {
           </Card>
         ))}
       </div>
+
+      {/* No Results Message */}
+      {filteredPoliticians.length === 0 && searchTerm && (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">
+            No politicians found matching "{searchTerm}"
+          </p>
+        </div>
+      )}
     </div>
   );
 };

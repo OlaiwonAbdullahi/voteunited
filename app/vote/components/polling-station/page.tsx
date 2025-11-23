@@ -100,7 +100,7 @@ interface PollingData {
   normalizedInput?: Address;
 }
 
-const Page = () => {
+const PollingStationPage = () => {
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -177,14 +177,14 @@ const Page = () => {
   };
 
   return (
-    <div className="fontroboto min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div className="fontroboto min-h-screen ">
       <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-mont font-bold text-primary dark:text-white mb-4">
+        <div className="text-start mb-6">
+          <h2 className="text-2xl md:text-4xl font-mont font-bold text-primary dark:text-white mb-3">
             Find Your Polling Information
-          </h1>
-          <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+          </h2>
+          <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl ">
             Enter your ZIP code or address to find polling locations, view
             candidates, and get election official contact information.
           </p>
@@ -515,7 +515,7 @@ const Page = () => {
                 {!pollingData.pollingLocations?.length &&
                   !pollingData.earlyVoteSites?.length &&
                   !pollingData.dropOffLocations?.length && (
-                    <div className="bg-white dark:bg-slate-800 p-8 rounded-lg border border-slate-200 dark:border-slate-700 text-center">
+                    <div className="bg-white dark:bg-slate-800 p-8 rounded-none  border border-slate-200 dark:border-slate-700 text-center">
                       <AlertCircle className="h-12 w-12 text-slate-400 mx-auto mb-4" />
                       <h3 className="text-xl font-mont font-bold text-slate-900 dark:text-white mb-2">
                         No Polling Locations Available
@@ -536,7 +536,7 @@ const Page = () => {
                   pollingData.contests.map((contest, index) => (
                     <div
                       key={index}
-                      className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700"
+                      className="bg-white dark:bg-slate-800 p-6 rounded-none border border-slate-200 dark:border-slate-700"
                     >
                       {/* Contest Header */}
                       <div className="mb-6">
@@ -639,7 +639,7 @@ const Page = () => {
                     </div>
                   ))
                 ) : (
-                  <div className="bg-white dark:bg-slate-800 p-8 rounded-lg border border-slate-200 dark:border-slate-700 text-center">
+                  <div className="bg-white dark:bg-slate-800 p-8 rounded-none border border-slate-200 dark:border-slate-700 text-center">
                     <Info className="h-12 w-12 text-slate-400 mx-auto mb-4" />
                     <h3 className="text-xl font-mont font-bold text-slate-900 dark:text-white mb-2">
                       No Contest Information Available
@@ -661,7 +661,7 @@ const Page = () => {
                   pollingData.electionOfficials.map((official, index) => (
                     <div
                       key={index}
-                      className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700"
+                      className="bg-white dark:bg-slate-800 p-6 rounded-none border border-slate-200 dark:border-slate-700"
                     >
                       <div className="flex items-start gap-3 mb-4">
                         <Building className="w-6 h-6 text-primary mt-1 flex-shrink-0" />
@@ -796,7 +796,7 @@ const Page = () => {
                     </div>
                   ))
                 ) : (
-                  <div className="bg-white dark:bg-slate-800 p-8 rounded-lg border border-slate-200 dark:border-slate-700 text-center">
+                  <div className="bg-white dark:bg-slate-800 p-8 rounded-none border border-slate-200 dark:border-slate-700 text-center">
                     <Building className="h-12 w-12 text-slate-400 mx-auto mb-4" />
                     <h3 className="text-xl font-mont font-bold text-slate-900 dark:text-white mb-2">
                       No Election Official Information Available
@@ -815,7 +815,7 @@ const Page = () => {
         {/* Info Section */}
         {!pollingData && !loading && (
           <div className="mt-12 max-w-3xl mx-auto">
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-8 rounded-lg">
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-8 rounded-none">
               <h3 className="text-xl font-mont font-bold text-primary dark:text-white mb-4">
                 Important Information
               </h3>
@@ -851,4 +851,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default PollingStationPage;

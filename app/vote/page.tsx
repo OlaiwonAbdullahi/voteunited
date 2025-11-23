@@ -4,6 +4,7 @@ import Featured from "./components/featured";
 import Countdown from "./components/countdown";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import PollingStationPage from "./components/polling-station/page";
 
 // Optionally, define a type/interface for politicians
 // interface PoliticianType {
@@ -112,7 +113,7 @@ const Page = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 mb-8">
-        <Countdown />
+        <PollingStationPage />
       </div>
 
       <div className="max-w-7xl mx-auto">
