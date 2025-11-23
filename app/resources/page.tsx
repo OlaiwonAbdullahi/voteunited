@@ -16,8 +16,8 @@ import {
   ExternalLink,
 } from "lucide-react";
 
-const CONGRESS_API_KEY = "kycYtq68dOZ6tjLnAf5GaVk4ayQ1QUGmG76aA3rc";
-const CONGRESS_API_URL = "https://api.congress.gov/v3/bill";
+const FCS_API_KEY = "OS0eBowhj6WC9Vwi9dY5";
+const FCS_API_URL = "https://news.fcsapi.com/api/news";
 
 interface NewsArticle {
   id: string;
@@ -46,65 +46,103 @@ export default function Resources() {
     fetchPoliticalNews();
   }, []);
 
-  // 🔥 FETCH FROM CONGRESS.GOV
+  // Helper function to decode HTML entities and Unicode characters
+  const decodeHtmlEntities = (text: string): string => {
+    if (!text) return text;
+
+    if (typeof document !== "undefined") {
+      const textarea = document.createElement("textarea");
+      textarea.innerHTML = text;
+      return textarea.value;
+    }
+
+    // Fallback for server-side rendering - decode common entities
+    return text
+      .replace(/&#(\d+);/g, (match, dec) => String.fromCharCode(dec))
+      .replace(/&quot;/g, '"')
+      .replace(/&apos;/g, "'")
+      .replace(/&#39;/g, "'")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&amp;/g, "&")
+      .replace(/\\u2019/g, "'")
+      .replace(/\\u2018/g, "'")
+      .replace(/\\u201c/g, '"')
+      .replace(/\\u201d/g, '"')
+      .replace(/\\u2013/g, "–")
+      .replace(/\\u2014/g, "—")
+      .replace(/\\u2026/g, "…");
+  };
+
+  // 🔥 FETCH FROM FCS NEWS API - STRICTLY US NEWS
   const fetchPoliticalNews = async () => {
     try {
       setLoading(true);
       setError(null);
 
       const response = await fetch(
-        `${CONGRESS_API_URL}?api_key=${CONGRESS_API_KEY}&format=json&limit=40&sort=dateOfIntroduction`
+        `${FCS_API_URL}?find=election+politics&country=us&access_key=${FCS_API_KEY}`
       );
 
       if (!response.ok) {
-        throw new Error(`Congress API Error: ${response.status}`);
+        throw new Error(`FCS News API Error: ${response.status}`);
       }
 
       const data = await response.json();
-      console.log(data);
+      console.log("API Response:", data);
 
-      if (!data.bills || data.bills.length === 0) {
-        throw new Error("No legislative news found from Congress API.");
+      if (!data.status || !data.response || data.response.length === 0) {
+        throw new Error("No election news found from FCS News API.");
       }
 
-      const transformed: NewsArticle[] = data.bills.map(
-        (bill: any, index: number) => {
-          const latestAction = bill.latestAction?.text || "No update available";
+      // Filter for strictly US news only
+      const usArticles = data.response.filter((article: any) => {
+        const country = article.country?.toUpperCase() || "";
+        return country.includes("US");
+      });
 
+      console.log(
+        `Filtered ${usArticles.length} US articles from ${data.response.length} total articles`
+      );
+
+      const transformed: NewsArticle[] = usArticles.map(
+        (article: any, index: number) => {
+          // Map FCS categories to our categories
           let category: NewsArticle["category"] = "Politics";
-          const actionLower = latestAction.toLowerCase();
+          const articleCategory = article.category?.toLowerCase() || "";
 
-          if (bill.type === "hr" || bill.type === "s") {
+          if (articleCategory.includes("election")) category = "Elections";
+          else if (articleCategory.includes("policy")) category = "Policy";
+          else if (articleCategory.includes("legislation"))
             category = "Legislation";
-          }
-          if (actionLower.includes("election")) category = "Elections";
-          if (actionLower.includes("policy")) category = "Policy";
+          else if (articleCategory.includes("opinion")) category = "Opinion";
 
           return {
-            id: bill.billNumber || `bill-${index}`,
-            title: bill.title || latestAction || "Congressional Update",
-            summary: latestAction,
-            content: latestAction,
+            id: article.id || `article-${index}`,
+            title: decodeHtmlEntities(article.title || "Election News Update"),
+            summary: decodeHtmlEntities(
+              article.description || "No description available"
+            ),
+            content: decodeHtmlEntities(
+              article.description || "No content available"
+            ),
             category,
-            date:
-              bill.latestAction?.actionDate ||
-              bill.dateOfIntroduction ||
-              new Date().toISOString().split("T")[0],
-            author: bill.sponsor?.fullName || "United States Congress",
+            date: article.publishedAt || new Date().toISOString().split("T")[0],
+            author: article.author || article.site || "Unknown",
             views: Math.round(Math.random() * 50000),
             trending: index < 8,
             relatedPoliticians: [],
-            image: "/flag.png",
-            url: bill.congressUrl || "https://www.congress.gov",
-            source: "Congress.gov",
+            image: article.image?.img || "/flag.png",
+            url: article.source || "#",
+            source: article.site || "FCS News",
           };
         }
       );
 
       setArticles(transformed);
-      console.log(transformed);
+      console.log("US Articles:", transformed);
     } catch (err: any) {
-      setError(err.message || "Failed to load Congress data.");
+      setError(err.message || "Failed to load election news data.");
     } finally {
       setLoading(false);
     }
@@ -154,7 +192,7 @@ export default function Resources() {
           <div className="flex flex-col items-center min-h-[400px]">
             <Loader2 className="w-12 h-12 animate-spin text-primary" />
             <p className="mt-4 text-slate-600 dark:text-slate-400">
-              Loading Congress updates...
+              Loading US election news...
             </p>
           </div>
         </main>
@@ -169,7 +207,7 @@ export default function Resources() {
           <div className="flex flex-col items-center min-h-[400px]">
             <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
             <p className="text-lg font-semibold text-red-600 mb-2">
-              Error Loading Congress Data
+              Error Loading Election News
             </p>
             <p className="text-sm text-slate-600 mb-4">{error}</p>
             <Button onClick={fetchPoliticalNews} className="rounded-none">
@@ -186,11 +224,11 @@ export default function Resources() {
       <main className="mx-auto max-w-6xl px-4 py-12">
         <div className="text-center p-10">
           <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">
-            Congress Updates
+            US Election News
           </h2>
           <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-            Live legislative news, updates, and actions directly from U.S.
-            Congress.
+            Stay informed with the latest election news and updates from across
+            the United States.
           </p>
         </div>
 
@@ -200,7 +238,7 @@ export default function Resources() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
-              placeholder="Search Congress updates..."
+              placeholder="Search election news..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 rounded-none"
@@ -238,7 +276,7 @@ export default function Resources() {
               if (!featured) return null;
 
               return (
-                <Card className="overflow-hidden rounded-none">
+                <Card className="overflow-hidden rounded-none p-0">
                   <div className="grid md:grid-cols-2">
                     <div className="aspect-video bg-muted">
                       <img
@@ -279,7 +317,7 @@ export default function Resources() {
 
                       <Button asChild className="rounded-none">
                         <a href={featured.url} target="_blank">
-                          View on Congress.gov <ExternalLink size={16} />
+                          Read Full Article <ExternalLink size={16} />
                         </a>
                       </Button>
                     </div>
@@ -295,11 +333,12 @@ export default function Resources() {
           {filteredNews.map((article, idx) => (
             <Card
               key={article.id || idx}
-              className="rounded-none overflow-hidden flex flex-col"
+              className="rounded-none overflow-hidden flex flex-col p-0"
             >
               <div className="aspect-video bg-muted">
                 <img
                   src={article.image}
+                  alt={article.title}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -343,7 +382,7 @@ export default function Resources() {
                   className="w-full rounded-none mt-3"
                 >
                   <a href={article.url} target="_blank">
-                    Read on Congress.gov <ExternalLink size={14} />
+                    Read Full Article <ExternalLink size={14} />
                   </a>
                 </Button>
               </div>
