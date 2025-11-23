@@ -271,7 +271,7 @@ const AllPolitician = ({ politicians = [] }: AllPoliticianProps) => {
       {filteredPoliticians.length === 0 && searchTerm && (
         <div className="text-center py-12">
           <p className="text-muted-foreground">
-            No politicians found matching "{searchTerm}"
+            No politicians found matching &apos;{searchTerm}&apos;
           </p>
         </div>
       )}

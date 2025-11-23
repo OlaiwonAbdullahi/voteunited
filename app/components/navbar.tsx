@@ -29,9 +29,6 @@ export default function Navbar() {
             <Button variant="ghost" asChild className="text-base">
               <Link href="/politicians">Politicians</Link>
             </Button>
-            <Button variant="ghost" asChild className="text-base">
-              <Link href="/polling-station">Polling Station</Link>
-            </Button>
             <Button variant="ghost" asChild className="text-base ">
               <Link href="/bills">Bills</Link>
             </Button>
@@ -78,9 +75,6 @@ export default function Navbar() {
             </Button>
             <Button variant="ghost" className="w-full justify-start" asChild>
               <Link href="/politicians">Politicians</Link>
-            </Button>
-            <Button variant="ghost" className="w-full justify-start" asChild>
-              <Link href="/polling-station">Polling Station</Link>
             </Button>
             <Button variant="ghost" className="w-full justify-start" asChild>
               <Link href="/bills">Bills</Link>
