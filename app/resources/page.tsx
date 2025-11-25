@@ -15,6 +15,7 @@ import {
   AlertCircle,
   ExternalLink,
 } from "lucide-react";
+import Hotline from "./_components/hotline";
 
 const FCS_API_KEY = "OS0eBowhj6WC9Vwi9dY5";
 const FCS_API_URL = "https://news.fcsapi.com/api/news";
@@ -220,7 +221,7 @@ export default function Resources() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background fontroboto">
       <main className="mx-auto max-w-6xl px-4 py-12">
         <div className="text-center p-10">
           <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">
@@ -396,6 +397,9 @@ export default function Resources() {
           </p>
         )}
       </main>
+      <div className="">
+        <Hotline />
+      </div>
     </div>
   );
 }
