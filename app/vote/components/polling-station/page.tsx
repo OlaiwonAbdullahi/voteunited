@@ -178,22 +178,14 @@ const PollingStationPage = () => {
 
   return (
     <div className="fontroboto min-h-screen ">
-      <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-start mb-6">
-          <h2 className="text-2xl md:text-4xl font-mont font-bold text-primary dark:text-white mb-3">
-            Find Your Polling Information
-          </h2>
-          <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl ">
-            Enter your ZIP code or address to find polling locations, view
-            candidates, and get election official contact information.
-          </p>
-        </div>
-
+      <main className="mx-auto max-w-7xl px-4 pt-12 sm:px-6 lg:px-8">
         {/* Search Form */}
-        <div className="max-w-2xl mx-auto mb-12">
+        <div className="max-w-3xl mx-auto mb-12">
           <div className="bg-white dark:bg-slate-800 p-6 rounded-none shadow-none border border-slate-200 dark:border-slate-700">
             <form onSubmit={handleSearch} className="space-y-4">
+              <h2 className="text-2xl font-mont font-bold text-primary dark:text-white mb-3">
+                Find Your Polling Information
+              </h2>
               <div>
                 <label
                   htmlFor="address"

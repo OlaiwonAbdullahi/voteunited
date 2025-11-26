@@ -104,11 +104,11 @@ const Page = () => {
     <div>
       <div className="md:max-w-7xl max-w-full mx-auto text-center p-10">
         <h2 className="text-4xl md:text-5xl font-mont font-bold text-primary dark:text-white mb-4">
-          Vote Your Candidate
+          Make Your Voice Heard
         </h2>
         <p className="text-lg text-slate-600 fontroboto dark:text-slate-400 max-w-2xl mx-auto">
-          Cast your vote for the candidate you believe in shaping the future of
-          our country.
+          Find your polling station, explore candidates, and cast your vote for
+          the leaders who will shape America&apos;s future.
         </p>
       </div>
 
