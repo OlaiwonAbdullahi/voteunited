@@ -25,6 +25,7 @@ const normalizePolitician = (
     party: string;
     district: string;
     state: string;
+    external_id: string;
   },
   index: number
 ) => ({
@@ -35,6 +36,7 @@ const normalizePolitician = (
   rank: index + 1,
   trending: true,
   position: `${raw.party} - District ${raw.district}, ${raw.state}`,
+  external_id: raw.external_id,
 });
 
 const Page = () => {

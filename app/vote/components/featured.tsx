@@ -22,6 +22,8 @@ import { useState } from "react";
 import { upvoteMember } from "@/lib/api";
 import toast from "react-hot-toast";
 
+const CONGRESS_API_KEY = "g4g9hInpzEbA7vb3j0rqCpNb40YcfUj2zRKed27i";
+
 // Type definitions
 interface Politician {
   id: string | number;
@@ -31,6 +33,36 @@ interface Politician {
   rank: number;
   votes: number;
   trending?: boolean;
+  external_id: string;
+  bio?: string;
+  bioguideId?: string;
+}
+
+interface MemberDetails {
+  bioguideId: string;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
+  birthYear?: string;
+  officialWebsiteUrl?: string;
+  partyHistory?: Array<{
+    partyName: string;
+    partyAbbreviation: string;
+    startYear: number;
+  }>;
+  terms?: Array<{
+    chamber: string;
+    congress: number;
+    district?: number;
+    memberType: string;
+    startYear: number;
+    stateCode: string;
+    stateName: string;
+  }>;
+  depiction?: {
+    imageUrl: string;
+    attribution?: string;
+  };
 }
 
 interface FeaturedProps {
@@ -40,6 +72,12 @@ interface FeaturedProps {
 const Featured = ({ politicians }: FeaturedProps) => {
   const [items, setItems] = useState(politicians);
   const [loadingId, setLoadingId] = useState<string | number | null>(null);
+  const [selectedPolitician, setSelectedPolitician] =
+    useState<Politician | null>(null);
+  const [loadingDetails, setLoadingDetails] = useState<boolean>(false);
+  const [selectedMemberDetails, setSelectedMemberDetails] =
+    useState<MemberDetails | null>(null);
+  const [dialogOpen, setDialogOpen] = useState<string | null>(null);
 
   const handleUpvote = async (id: string | number) => {
     try {
@@ -63,6 +101,79 @@ const Featured = ({ politicians }: FeaturedProps) => {
       toast.error("Something went wrong ❌");
     } finally {
       setLoadingId(null);
+    }
+  };
+
+  const fetchMemberDetails = async (detailId: string) => {
+    try {
+      setLoadingDetails(true);
+      const response = await fetch(
+        `https://api.congress.gov/v3/member/${detailId}?format=json&api_key=${CONGRESS_API_KEY}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch member details: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Member Details:", data);
+
+      if (data.member) {
+        setSelectedMemberDetails(data.member);
+
+        // Update the politician's bio in the list
+        setItems((prev) =>
+          prev.map((p) => {
+            if (p.external_id === detailId) {
+              const member = data.member;
+              const partyInfo = member.partyHistory?.[0];
+              const termInfo = member.terms?.[0];
+
+              let bioText = `${member.firstName || ""} ${
+                member.middleName || ""
+              } ${member.lastName || ""}`;
+
+              if (member.birthYear) {
+                bioText += ` was born in ${member.birthYear}.`;
+              }
+
+              if (partyInfo) {
+                bioText += ` Member of the ${partyInfo.partyName} party since ${partyInfo.startYear}.`;
+              }
+
+              if (termInfo) {
+                bioText += ` Currently serving in the ${termInfo.chamber}`;
+                if (termInfo.district) {
+                  bioText += `, representing District ${termInfo.district} of ${termInfo.stateName}`;
+                } else {
+                  bioText += ` representing ${termInfo.stateName}`;
+                }
+                bioText += `.`;
+              }
+
+              if (member.officialWebsiteUrl) {
+                bioText += ` Official website: ${member.officialWebsiteUrl}`;
+              }
+
+              return { ...p, bio: bioText };
+            }
+            return p;
+          })
+        );
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      console.error("Error fetching member details:", err);
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
+
+  const handleOpenDialog = (politician: Politician) => {
+    setSelectedPolitician(politician);
+    setDialogOpen(politician.id.toString());
+    if (politician.external_id) {
+      fetchMemberDetails(politician.external_id);
     }
   };
   return (
@@ -161,26 +272,45 @@ const Featured = ({ politicians }: FeaturedProps) => {
                             </div>
                           </div>
 
-                          <Dialog>
+                          <Dialog
+                            open={dialogOpen === politician.id.toString()}
+                            onOpenChange={(open) => {
+                              if (!open) {
+                                setDialogOpen(null);
+                                setSelectedPolitician(null);
+                                setSelectedMemberDetails(null);
+                              }
+                            }}
+                          >
                             <DialogTrigger asChild>
-                              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none w-full">
+                              <Button
+                                onClick={() => handleOpenDialog(politician)}
+                                className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none w-full"
+                              >
                                 View Profile
                               </Button>
                             </DialogTrigger>
                             <DialogContent className="sm:max-w-xl">
                               <DialogHeader>
                                 <DialogTitle className="fontmont">
-                                  {politician.name}
+                                  {selectedPolitician?.name ?? politician.name}
                                 </DialogTitle>
                                 <DialogDescription className="fontroboto">
-                                  {politician.position}
+                                  {selectedPolitician?.position ??
+                                    politician.position}
                                 </DialogDescription>
                               </DialogHeader>
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="rounded-md border border-border overflow-hidden">
                                   <img
-                                    src={politician.image}
-                                    alt={politician.name}
+                                    src={
+                                      selectedPolitician?.image ??
+                                      politician.image
+                                    }
+                                    alt={
+                                      selectedPolitician?.name ??
+                                      politician.name
+                                    }
                                     className="w-full h-40 object-cover"
                                   />
                                 </div>
@@ -189,7 +319,9 @@ const Featured = ({ politicians }: FeaturedProps) => {
                                     Rank
                                   </div>
                                   <div className="text-lg font-semibold text-foreground">
-                                    #{politician.rank}
+                                    #
+                                    {selectedPolitician?.rank ??
+                                      politician.rank}
                                   </div>
                                   {/* <div className="text-sm text-muted-foreground fontroboto">
                                     Votes
@@ -197,23 +329,60 @@ const Featured = ({ politicians }: FeaturedProps) => {
                                   <div className="text-lg font-semibold text-primary fontmont">
                                     {politician.votes}
                                   </div> */}
-                                  {politician.trending && (
+                                  {(selectedPolitician?.trending ??
+                                    politician.trending) && (
                                     <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1 text-sm text-secondary-foreground">
                                       <TrendingUp size={14} /> Trending
                                     </div>
                                   )}
                                 </div>
                               </div>
+
+                              {/* Biography Section */}
+                              {loadingDetails && (
+                                <div className="flex items-center justify-center py-4">
+                                  <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+                                  <span className="ml-2 text-sm text-muted-foreground">
+                                    Loading details...
+                                  </span>
+                                </div>
+                              )}
+
+                              {!loadingDetails &&
+                                (selectedPolitician?.bio || politician.bio) && (
+                                  <div className="mt-4">
+                                    <div className="text-sm text-muted-foreground fontroboto mb-2">
+                                      Biography
+                                    </div>
+                                    <p className="text-sm text-foreground fontroboto leading-relaxed">
+                                      {selectedPolitician?.bio ||
+                                        politician.bio}
+                                    </p>
+                                  </div>
+                                )}
                               <DialogFooter>
-                                <Button className="rounded-none">
-                                  Vote Now
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  className="rounded-none"
-                                >
-                                  View Full Profile
-                                </Button>
+                                <div className="flex gap-2 items-center">
+                                  <Button
+                                    aria-label={`Upvote ${politician.name}`}
+                                    className="text-primary hover:bg-primary/90 border border-primary bg-transparent rounded-none"
+                                    variant="outline"
+                                    disabled={loadingId === politician.id}
+                                    onClick={() => handleUpvote(politician.id)}
+                                  >
+                                    {loadingId === politician.id ? (
+                                      <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+                                    ) : (
+                                      <ThumbsUp className="w-10 h-10" />
+                                    )}
+                                  </Button>
+                                  <Button
+                                    aria-label={`Downvote ${politician.name} from modal`}
+                                    className="text-primary hover:bg-primary/90 border border-primary rounded-none bg-transparent"
+                                    variant="outline"
+                                  >
+                                    <ThumbsDown className="w-6 h-6" />
+                                  </Button>
+                                </div>
                               </DialogFooter>
                             </DialogContent>
                           </Dialog>

@@ -17,6 +17,8 @@ import { useEffect, useState } from "react";
 import { upvoteMember } from "@/lib/api";
 import toast from "react-hot-toast";
 
+const CONGRESS_API_KEY = "g4g9hInpzEbA7vb3j0rqCpNb40YcfUj2zRKed27i";
+
 // Type definitions
 interface Politician {
   id: string | number;
@@ -26,6 +28,9 @@ interface Politician {
   rank: number;
   votes: number;
   trending?: boolean;
+  external_id: string;
+  bio?: string;
+  bioguideId?: string;
 }
 
 interface AllPoliticianProps {
@@ -43,6 +48,33 @@ interface VoteResponse {
 
 type VoteType = "up" | "down";
 
+interface MemberDetails {
+  bioguideId: string;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
+  birthYear?: string;
+  officialWebsiteUrl?: string;
+  partyHistory?: Array<{
+    partyName: string;
+    partyAbbreviation: string;
+    startYear: number;
+  }>;
+  terms?: Array<{
+    chamber: string;
+    congress: number;
+    district?: number;
+    memberType: string;
+    startYear: number;
+    stateCode: string;
+    stateName: string;
+  }>;
+  depiction?: {
+    imageUrl: string;
+    attribution?: string;
+  };
+}
+
 const AllPolitician = ({ politicians = [] }: AllPoliticianProps) => {
   const [items, setItems] = useState(politicians);
   const [ip, setIp] = useState<string | null>(null);
@@ -51,6 +83,10 @@ const AllPolitician = ({ politicians = [] }: AllPoliticianProps) => {
   const [list, setList] = useState<Politician[]>(politicians);
   const [loadingId, setLoadingId] = useState<string | number | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [loadingDetails, setLoadingDetails] = useState<boolean>(false);
+  const [selectedMemberDetails, setSelectedMemberDetails] =
+    useState<MemberDetails | null>(null);
+  const [dialogOpen, setDialogOpen] = useState<string | null>(null);
 
   // keep local list in sync if the prop changes
   useEffect(() => {
@@ -106,6 +142,78 @@ const AllPolitician = ({ politicians = [] }: AllPoliticianProps) => {
     );
   });
 
+  const fetchMemberDetails = async (detailId: string) => {
+    try {
+      setLoadingDetails(true);
+      const response = await fetch(
+        `https://api.congress.gov/v3/member/${detailId}?format=json&api_key=${CONGRESS_API_KEY}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch member details: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Member Details:", data);
+
+      if (data.member) {
+        setSelectedMemberDetails(data.member);
+
+        // Update the politician's bio in the list
+        setList((prev) =>
+          prev.map((p) => {
+            if (p.external_id === detailId) {
+              const member = data.member;
+              const partyInfo = member.partyHistory?.[0];
+              const termInfo = member.terms?.[0];
+
+              let bioText = `${member.firstName || ""} ${
+                member.middleName || ""
+              } ${member.lastName || ""}`;
+
+              if (member.birthYear) {
+                bioText += ` was born in ${member.birthYear}.`;
+              }
+
+              if (partyInfo) {
+                bioText += ` Member of the ${partyInfo.partyName} party since ${partyInfo.startYear}.`;
+              }
+
+              if (termInfo) {
+                bioText += ` Currently serving in the ${termInfo.chamber}`;
+                if (termInfo.district) {
+                  bioText += `, representing District ${termInfo.district} of ${termInfo.stateName}`;
+                } else {
+                  bioText += ` representing ${termInfo.stateName}`;
+                }
+                bioText += `.`;
+              }
+
+              if (member.officialWebsiteUrl) {
+                bioText += ` Official website: ${member.officialWebsiteUrl}`;
+              }
+
+              return { ...p, bio: bioText };
+            }
+            return p;
+          })
+        );
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      console.error("Error fetching member details:", err);
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
+
+  const handleOpenDialog = (politician: Politician) => {
+    setSelectedPolitician(politician);
+    setDialogOpen(politician.id.toString());
+    if (politician.external_id) {
+      fetchMemberDetails(politician.external_id);
+    }
+  };
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       <div className="flex items-center justify-between mb-6">
@@ -194,10 +302,19 @@ const AllPolitician = ({ politicians = [] }: AllPoliticianProps) => {
                   </div>
                 </div>
 
-                <Dialog>
+                <Dialog
+                  open={dialogOpen === politician.id.toString()}
+                  onOpenChange={(open) => {
+                    if (!open) {
+                      setDialogOpen(null);
+                      setSelectedPolitician(null);
+                      setSelectedMemberDetails(null);
+                    }
+                  }}
+                >
                   <DialogTrigger asChild>
                     <Button
-                      onClick={() => setSelectedPolitician(politician)}
+                      onClick={() => handleOpenDialog(politician)}
                       className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-none w-full"
                     >
                       View Profile
@@ -235,6 +352,29 @@ const AllPolitician = ({ politicians = [] }: AllPoliticianProps) => {
                         )}
                       </div>
                     </div>
+
+                    {/* Biography Section */}
+                    {loadingDetails && (
+                      <div className="flex items-center justify-center py-4">
+                        <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+                        <span className="ml-2 text-sm text-muted-foreground">
+                          Loading details...
+                        </span>
+                      </div>
+                    )}
+
+                    {!loadingDetails &&
+                      (selectedPolitician?.bio || politician.bio) && (
+                        <div className="mt-4">
+                          <div className="text-sm text-muted-foreground fontroboto mb-2">
+                            Biography
+                          </div>
+                          <p className="text-sm text-foreground fontroboto leading-relaxed">
+                            {selectedPolitician?.bio || politician.bio}
+                          </p>
+                        </div>
+                      )}
+
                     <DialogFooter>
                       <div className="flex gap-2 items-center">
                         <Button

@@ -39,11 +39,7 @@ export default function Footer() {
                   Politicians
                 </Link>
               </li>
-              <li>
-                <Link href="/legislation" className="hover:text-primary">
-                  Legislation
-                </Link>
-              </li>
+
               <li>
                 <Link href="/vote" className="hover:text-primary">
                   Vote
