@@ -233,7 +233,7 @@ const StateSelector = () => {
               <Button
                 onClick={handleGoToVotingSite}
                 disabled={!selectedState}
-                className="w-full h-12 rounded-none text-base fontroboto shadow-none hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group"
+                className="w-full h-8 rounded-none text-base fontroboto shadow-none hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group"
               >
                 <Search size={18} className="mr-2" />
                 Go to Voting Site
