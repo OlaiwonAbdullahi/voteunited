@@ -1,7 +1,7 @@
 import Hero from "./components/hero";
 import TopPoliticians from "./components/topPoliticians";
 //import Partners from "./components/partners";
-import FeaturedResources from "./components/featuredResources";
+//import FeaturedResources from "./components/featuredResources";
 
 const Page = () => {
   return (
@@ -11,7 +11,9 @@ const Page = () => {
       <Partners />
       */}
       <TopPoliticians />
+      {/*
       <FeaturedResources />
+      */}
     </div>
   );
 };
