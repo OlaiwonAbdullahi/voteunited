@@ -21,6 +21,18 @@ export default function Footer() {
             <p className="mt-3 text-sm text-muted-foreground max-w-xs">
               Empowering citizens to make informed political choices.
             </p>
+            <div className="mt-3 text-sm text-muted-foreground max-w-xs flex flex-col">
+              <div className="">Contact info:</div>
+              <div className=" flex flex-col">
+                <a href="mailto:info@voteunited.com" className=" text-black">
+                  info@voteunited.com
+                </a>
+                <span>or </span>
+                <a href="mailto:sales@voteunited.com" className=" text-black">
+                  sales@voteunited.com
+                </a>
+              </div>
+            </div>
           </div>
 
           {/* Links */}
@@ -41,7 +53,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/news" className="hover:text-primary">
+                <Link href="/resources" className="hover:text-primary">
                   Resources
                 </Link>
               </li>
@@ -106,9 +118,6 @@ export default function Footer() {
             </Link>
             <Link href="/terms" className="hover:text-primary">
               Terms
-            </Link>
-            <Link href="/contact" className="hover:text-primary">
-              Contact
             </Link>
           </div>
         </div>

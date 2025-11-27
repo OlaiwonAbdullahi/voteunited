@@ -1,6 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { TrendingUp, Vote, Loader2, AlertCircle } from "lucide-react";
+import {
+  TrendingUp,
+  Vote,
+  Loader2,
+  AlertCircle,
+  Trophy,
+  Flag,
+  MapPin,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import {
   Dialog,
@@ -89,7 +97,7 @@ const PoliticianCard = ({
             <img
               src={politician.image}
               alt={politician.name}
-              className="w-full h-full object-contain"
+              className="w-full md:h-full h-[300px] object-fill"
               onError={(e) => {
                 e.currentTarget.src = "/flag.png";
               }}
@@ -142,58 +150,104 @@ const PoliticianCard = ({
         </div>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="sm:max-w-xl overflow-auto h-[90vh] rounded-none">
         <DialogHeader>
           <DialogTitle className="fontmont">{politician.name}</DialogTitle>
           <DialogDescription className="fontroboto">
             {politician.position}
           </DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 fontroboto">
           <div className="rounded-none border border-border overflow-hidden">
             <img
               src={politician.image}
               alt={politician.name}
-              className="w-full h-full object-contain"
+              className="w-full md:h-full h-[300px] object-fill"
               onError={(e) => {
                 e.currentTarget.src = "/flag.png";
               }}
             />
           </div>
-          <div className="space-y-2">
-            <div className="text-sm text-muted-foreground fontroboto">Rank</div>
-            <div className="text-lg font-semibold text-foreground">
-              #{politician.rank}
+          <div className="flex flex-col gap-4">
+            <div className="grid md:grid-cols-1 grid-cols-2 gap-3">
+              {/* Rank Card */}
+              <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700 flex items-center gap-3">
+                <div className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-full text-yellow-600 dark:text-yellow-400">
+                  <Trophy size={18} />
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground fontroboto uppercase tracking-wider">
+                    Rank
+                  </div>
+                  <div className="text-lg font-bold text-foreground">
+                    #{politician.rank}
+                  </div>
+                </div>
+              </div>
+
+              {/* Votes Card */}
+              <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700 flex items-center gap-3">
+                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full text-blue-600 dark:text-blue-400">
+                  <Vote size={18} />
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground fontroboto uppercase tracking-wider">
+                    Votes
+                  </div>
+                  <div className="text-lg font-bold text-foreground">
+                    {politician.votes}
+                  </div>
+                </div>
+              </div>
+
+              {/* Party Card */}
+              {politician.party && (
+                <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700 flex items-center gap-3">
+                  <div
+                    className={`p-2 rounded-full ${
+                      politician.party === "Democratic"
+                        ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                        : politician.party === "Republican"
+                        ? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
+                        : "bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400"
+                    }`}
+                  >
+                    <Flag size={18} />
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground fontroboto uppercase tracking-wider">
+                      Party
+                    </div>
+                    <div className="text-sm font-bold text-foreground">
+                      {politician.party}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* State Card */}
+              {politician.state && (
+                <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700 flex items-center gap-3">
+                  <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-full text-green-600 dark:text-green-400">
+                    <MapPin size={18} />
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground fontroboto uppercase tracking-wider">
+                      State
+                    </div>
+                    <div className="text-lg font-bold text-foreground">
+                      {politician.state}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-            {politician.party && (
-              <>
-                <div className="text-sm text-muted-foreground fontroboto">
-                  Party
-                </div>
-                <div className="text-lg font-semibold text-foreground">
-                  {politician.party}
-                </div>
-              </>
-            )}
-            {politician.state && (
-              <>
-                <div className="text-sm text-muted-foreground fontroboto">
-                  State
-                </div>
-                <div className="text-lg font-semibold text-foreground">
-                  {politician.state}
-                </div>
-              </>
-            )}
-            <div className="text-sm text-muted-foreground fontroboto">
-              Votes
-            </div>
-            <div className="text-lg font-semibold text-primary fontmont">
-              {politician.votes}
-            </div>
+
+            {/* Trending Badge */}
             {politician.trending && (
-              <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1 text-sm text-secondary-foreground">
-                <TrendingUp size={14} /> Trending
+              <div className="w-full bg-gradient-to-r from-red-100 to-red-50 dark:from-red-900/20 dark:to-red-900/10 border border-red-200 dark:border-red-800/30 p-3 rounded-lg flex items-center justify-center gap-2 text-red-700 dark:text-red-400 font-medium">
+                <TrendingUp size={16} />
+                <span>Currently Trending in Polls</span>
               </div>
             )}
           </div>
