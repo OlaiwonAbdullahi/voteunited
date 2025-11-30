@@ -24,10 +24,6 @@ export default function Footer() {
                 <a href="mailto:info@voteunited.com" className=" text-black">
                   info@voteunited.com
                 </a>
-                <span>or </span>
-                <a href="mailto:sales@voteunited.com" className=" text-black">
-                  sales@voteunited.com
-                </a>
               </div>
             </div>
           </div>
