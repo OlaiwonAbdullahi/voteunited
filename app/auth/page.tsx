@@ -60,9 +60,7 @@ const GoogleLoginButton = () => {
 
 const LoginPage: React.FC = () => {
   return (
-    <GoogleOAuthProvider
-      clientId={`${process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}`}
-    >
+    <GoogleOAuthProvider clientId="649644210746-pripag64sp9svnrumn4oto05eo9le8bp.apps.googleusercontent.com">
       <div className="flex relative flex-col items-center justify-center fontroboto min-h-screen bg-gray-50 p-4 w-full">
         <div className="absolute top-6 left-6">
           <Link href="/" className="flex items-center gap-2 font-mont">
