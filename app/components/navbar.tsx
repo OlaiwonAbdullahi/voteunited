@@ -40,17 +40,10 @@ export default function Navbar() {
           {/* Auth Buttons */}
           <div className="flex items-center gap-2">
             <Button
-              variant="outline"
-              className="hidden lg:inline-flex gap-2 text-base bg-transparent shadow-none rounded-none border-primary"
-              asChild
-            >
-              <Link href="/login">Sign In</Link>
-            </Button>
-            <Button
               className="hidden lg:inline-flex gap-2 text-base shadow-none rounded-none"
               asChild
             >
-              <Link href="/signup">Create Account</Link>
+              <Link href="/auth">Sign up / Log in</Link>
             </Button>
 
             {/* Mobile Menu Button */}

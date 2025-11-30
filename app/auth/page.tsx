@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 const GoogleLoginButton = () => {
   const login = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
+      console.log(tokenResponse);
       try {
         const response = await fetch(
           "https://voteunited.laravel.cloud/api/auth/login",
@@ -20,11 +21,11 @@ const GoogleLoginButton = () => {
             }),
           }
         );
+        console.log(response);
 
         if (!response.ok) {
           throw new Error("Login failed");
         }
-
         const data = await response.json();
         toast.success("Login successful!");
         console.log("Login success:", data);
