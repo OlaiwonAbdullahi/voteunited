@@ -292,7 +292,7 @@ const Featured = ({ politicians }: FeaturedProps) => {
                                   )}
                                 </Button>
                                 <Button
-                                 onClick={() => handleDownvote(politician.id)}
+                                  onClick={() => handleDownvote(politician.id)}
                                   aria-label={`Downvote ${politician.name}`}
                                   className="text-primary hover:bg-primary/90 border border-primary rounded-none bg-red-100"
                                   variant="outline"
@@ -424,11 +424,14 @@ const Featured = ({ politicians }: FeaturedProps) => {
                                     )}
                                   </Button>
                                   <Button
-                                    aria-label={`Downvote ${politician.name} from modal`}
-                                    className="text-primary hover:bg-primary/90 border border-primary rounded-none bg-transparent"
+                                    onClick={() =>
+                                      handleDownvote(politician.id)
+                                    }
+                                    aria-label={`Downvote ${politician.name}`}
+                                    className="text-primary hover:bg-primary/90 border border-primary rounded-none bg-red-100"
                                     variant="outline"
                                   >
-                                    <ThumbsDown className="w-6 h-6" />
+                                    <ThumbsDown className="w-10 h-10" />
                                   </Button>
                                 </div>
                               </DialogFooter>
