@@ -60,14 +60,11 @@ const GoogleLoginButton = () => {
 
 const LoginPage: React.FC = () => {
   return (
-    <GoogleOAuthProvider clientId="649644210746-pripag64sp9svnrumn4oto05eo9le8bp.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId="904187096076-pr1acp7ricmtc2t3cdap19fi1q6j5nc7.apps.googleusercontent.com">
       <div className="flex relative flex-col items-center justify-center fontroboto min-h-screen bg-gray-50 p-4 w-full">
         <div className="absolute top-6 left-6">
-          <Link href="/" className="flex items-center gap-2 font-mont">
-            <Image src="/flag.png" alt="flag" width={24} height={34} />
-            <span className=" text-xl font-bold text-primary sm:inline">
-              Vote United
-            </span>
+          <Link href="/auth" className="flex items-center gap-2 font-mont">
+            <Image src="/logo.jpg" alt="logo" width={100} height={100} />
           </Link>
         </div>
         <div className="bg-white border border-gray-200 p-8 rounded-none shadow-md w-full max-w-md">
