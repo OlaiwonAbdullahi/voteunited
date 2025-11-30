@@ -121,9 +121,9 @@ const AllPolitician = ({ politicians = [] }: AllPoliticianProps) => {
           )
         );
 
-        toast.success("Vote successful! 🎉");
+        toast.success(res?.message);
       } else {
-        toast.error(res?.message || "You already voted ❌");
+        toast(res?.message || "You already voted ❌");
       }
     } catch (err) {
       console.error(err);
@@ -146,9 +146,9 @@ const AllPolitician = ({ politicians = [] }: AllPoliticianProps) => {
           )
         );
 
-        toast.success("Downvote successful! 👎");
+        toast.success(res?.message);
       } else {
-        toast.error(res?.message || "You already voted ❌");
+        toast(res?.message || "You already voted ❌");
       }
     } catch (err) {
       console.error(err);

@@ -9,7 +9,7 @@ export default function LayoutClient({
 }: {
   children: React.ReactNode;
 }) {
-  const hidePaths = ["/login", "/signup"];
+  const hidePaths = ["/auth"];
   const pathname = usePathname();
 
   const hideNavbar = hidePaths.includes(pathname);

@@ -1,13 +1,44 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut, User, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [user, setUser] = useState<any>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (e) {
+        console.error("Failed to parse user data", e);
+      }
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    router.push("/");
+    router.refresh();
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-primary/20 fontroboto bg-white text-[#0A3161] backdrop-blur">
@@ -22,7 +53,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden gap-1  lg:flex ">
+          <nav className="hidden gap-1 lg:flex ">
             <Button variant="ghost" asChild className="text-base">
               <Link href="/politicians">Politicians</Link>
             </Button>
@@ -37,21 +68,63 @@ export default function Navbar() {
             </Button>
           </nav>
 
-          {/* Auth Buttons */}
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              className="hidden lg:inline-flex gap-2 text-base bg-transparent shadow-none rounded-none border-primary"
-              asChild
-            >
-              <Link href="/login">Sign In</Link>
-            </Button>
-            <Button
-              className="hidden lg:inline-flex gap-2 text-base shadow-none rounded-none"
-              asChild
-            >
-              <Link href="/signup">Create Account</Link>
-            </Button>
+          {/* Auth Buttons & Mobile Toggle */}
+          <div className="flex items-center gap-2 flex-row-reverse fontroboto">
+            {user ? (
+              <div className="flex items-center gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="relative h-10 w-10 rounded-full"
+                    >
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage
+                          src={
+                            user.avatar ||
+                            `https://api.dicebear.com/9.x/glass/svg?seed=${user.name}`
+                          }
+                          alt={user.name || "User"}
+                        />
+                        <AvatarFallback>
+                          {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    className="w-56 fontroboto"
+                    align="end"
+                    forceMount
+                  >
+                    <DropdownMenuItem className="font-medium">
+                      <User className="mr-1 h-4 w-4" />
+                      <span>{user.name}</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="font-medium">
+                      <Mail className="mr-1 h-4 w-4" />
+                      <span>{user.email.slice(0, 20)}...</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      className="text-red-500"
+                    >
+                      <LogOut className="mr-1 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            ) : (
+              <Button
+                className="hidden lg:inline-flex gap-2 text-base shadow-none rounded-none"
+                asChild
+              >
+                <Link href="/auth">Sign up / Log in</Link>
+              </Button>
+            )}
 
             {/* Mobile Menu Button */}
             <button
@@ -81,16 +154,11 @@ export default function Navbar() {
               <Link href="/resources">Resources</Link>
             </Button>
             <div className="flex flex-col gap-2 pt-2 border-t border-border">
-              <Button
-                variant="outline"
-                className="w-full bg-transparent"
-                asChild
-              >
-                <Link href="/login">Sign In</Link>
-              </Button>
-              <Button className="w-full" asChild>
-                <Link href="/signup">Create Account</Link>
-              </Button>
+              {!user && (
+                <Button className="w-full" asChild>
+                  <Link href="/auth">Sign up / Log in</Link>
+                </Button>
+              )}
             </div>
           </nav>
         )}
