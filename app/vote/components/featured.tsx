@@ -20,7 +20,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useState } from "react";
-import { upvoteMember } from "@/lib/api";
+import { downvoteMember, upvoteMember } from "@/lib/api";
 import toast from "react-hot-toast";
 
 const CONGRESS_API_KEY = "g4g9hInpzEbA7vb3j0rqCpNb40YcfUj2zRKed27i";
@@ -109,6 +109,30 @@ const Featured = ({ politicians }: FeaturedProps) => {
     }
   };
 
+  const handleDownvote = async (id: string | number) => {
+    try {
+      setLoadingId(id);
+
+      const res = await downvoteMember(id);
+
+      if (res?.success) {
+        setItems((prev) =>
+          prev.map((item) =>
+            item.id === id ? { ...item, votes: item.votes - 1 } : item
+          )
+        );
+
+        toast.success("Downvote successful! 👎");
+      } else {
+        toast.error(res?.message || "You already voted ❌");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong ❌");
+    } finally {
+      setLoadingId(null);
+    }
+  };
   const fetchMemberDetails = async (detailId: string) => {
     try {
       setLoadingDetails(true);
@@ -268,6 +292,7 @@ const Featured = ({ politicians }: FeaturedProps) => {
                                   )}
                                 </Button>
                                 <Button
+                                 onClick={() => handleDownvote(politician.id)}
                                   aria-label={`Downvote ${politician.name}`}
                                   className="text-primary hover:bg-primary/90 border border-primary rounded-none bg-red-100"
                                   variant="outline"

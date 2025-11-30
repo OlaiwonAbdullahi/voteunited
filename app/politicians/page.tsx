@@ -8,6 +8,8 @@ import {
   Trophy,
   Flag,
   MapPin,
+  ThumbsUp,
+  ThumbsDown,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import {
@@ -21,16 +23,19 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { toast } from "sonner";
 
 const CURRENT_CONGRESS = "119";
 const CONGRESS_API_KEY = "g4g9hInpzEbA7vb3j0rqCpNb40YcfUj2zRKed27i";
 
 interface Politician {
   id: string;
+  memberId: number;
   name: string;
   position: string;
   image: string;
   votes: string;
+  votesCount: number;
   trending: boolean;
   rank: number;
   party?: string;
@@ -63,22 +68,64 @@ interface MemberDetails {
   };
 }
 
+interface VoteState {
+  [memberId: string]: "upvote" | "downvote" | null;
+}
+
+// Helper functions for localStorage
+const getVoteState = (): VoteState => {
+  if (typeof window === "undefined") return {};
+  const stored = localStorage.getItem("user_votes");
+  return stored ? JSON.parse(stored) : {};
+};
+
+const saveVoteState = (state: VoteState) => {
+  if (typeof window === "undefined") return;
+  localStorage.setItem("user_votes", JSON.stringify(state));
+};
+
+const getClientIP = async (): Promise<string> => {
+  try {
+    const response = await fetch("https://api.ipify.org?format=json");
+    const data = await response.json();
+    return data.ip;
+  } catch (error) {
+    console.error("Error fetching IP:", error);
+    return "127.0.0.1";
+  }
+};
+
 const PoliticianCard = ({
   politician,
   isTopRanked,
   onOpenDialog,
+  onVote,
+  userVote,
 }: {
   politician: Politician;
   isTopRanked: boolean;
   onOpenDialog: (bioguideId: string) => void;
+  onVote: (memberId: string, voteType: "upvote" | "downvote") => void;
+  userVote: "upvote" | "downvote" | null;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isVoting, setIsVoting] = useState(false);
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
     if (open && politician.bioguideId) {
       onOpenDialog(politician.bioguideId);
     }
+  };
+
+  const handleVote = async (
+    e: React.MouseEvent,
+    voteType: "upvote" | "downvote"
+  ) => {
+    e.stopPropagation();
+    setIsVoting(true);
+    await onVote(politician.id, voteType);
+    setIsVoting(false);
   };
 
   return (
@@ -135,11 +182,37 @@ const PoliticianCard = ({
                 )}
               </div>
 
-              <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-200 dark:border-slate-700">
+              <div className="flex flex-wrap items-center justify-between gap-4 text-sm text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-200 dark:border-slate-700">
                 <span className="flex items-center gap-1.5">
                   <Vote size={16} className="text-slate-400" />
                   {politician.votes} votes
                 </span>
+
+                {/* Vote Buttons */}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={(e) => handleVote(e, "upvote")}
+                    disabled={isVoting}
+                    className={`p-2 rounded-lg transition-all ${
+                      userVote === "upvote"
+                        ? "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                        : "bg-slate-100 text-slate-600 hover:bg-green-50 hover:text-green-600 dark:bg-slate-700 dark:text-slate-400"
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    <ThumbsUp size={16} />
+                  </button>
+                  <button
+                    onClick={(e) => handleVote(e, "downvote")}
+                    disabled={isVoting}
+                    className={`p-2 rounded-lg transition-all ${
+                      userVote === "downvote"
+                        ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400"
+                        : "bg-slate-100 text-slate-600 hover:bg-red-50 hover:text-red-600 dark:bg-slate-700 dark:text-slate-400"
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    <ThumbsDown size={16} />
+                  </button>
+                </div>
               </div>
 
               <div className="w-full mt-4 px-6 py-3 bg-primary dark:bg-slate-100 text-white dark:text-slate-900 rounded-none font-semibold transition-all duration-200 flex items-center justify-center gap-2">
@@ -278,9 +351,11 @@ const Politicians = () => {
   const [selectedMemberDetails, setSelectedMemberDetails] =
     useState<MemberDetails | null>(null);
   const [loadingDetails, setLoadingDetails] = useState<boolean>(false);
+  const [userVotes, setUserVotes] = useState<VoteState>({});
 
   useEffect(() => {
     fetchCongressMembers();
+    setUserVotes(getVoteState());
   }, []);
 
   const fetchCongressMembers = async () => {
@@ -294,9 +369,6 @@ const Politicians = () => {
       }
 
       const data = await response.json();
-      console.log("API RESPONSE:", data);
-
-      // 🛠 FIX: members is a direct array, not nested under data
       const members = data?.members || [];
 
       if (!Array.isArray(members)) {
@@ -314,15 +386,19 @@ const Politicians = () => {
             position = "U.S. Representative";
           }
 
+          const votesCount = member.votes_count || 0;
+
           return {
             id: member.external_id,
+            memberId: member.id,
             name: member.name,
             position,
             image: member.image_url,
             party: member.party,
             state: member.state,
             district: member.district,
-            votes: member.votes_count?.toLocaleString() || "0",
+            votes: votesCount.toLocaleString(),
+            votesCount: votesCount,
             trending: Math.random() > 0.7,
             rank: index + 1,
             bio: member.source_url ? `Source: ${member.source_url}` : "",
@@ -352,12 +428,10 @@ const Politicians = () => {
       }
 
       const data = await response.json();
-      console.log("Member Details:", data);
 
       if (data.member) {
         setSelectedMemberDetails(data.member);
 
-        // Update the politician's bio in the list
         setPoliticians((prev) =>
           prev.map((p) => {
             if (p.bioguideId === bioguideId) {
@@ -404,6 +478,122 @@ const Politicians = () => {
     }
   };
 
+  const handleVote = async (
+    memberId: string,
+    voteType: "upvote" | "downvote"
+  ) => {
+    const currentVote = userVotes[memberId];
+
+    // Prevent duplicate votes
+    if (currentVote === voteType) {
+      toast.error(`You already ${voteType}d this member`);
+      return;
+    }
+
+    // Find the politician to get their numeric memberId
+    const politician = politicians.find((p) => p.id === memberId);
+    if (!politician) {
+      toast.error("Member not found");
+      return;
+    }
+
+    try {
+      const ip = await getClientIP();
+
+      // Optimistic UI update
+      setPoliticians((prev) =>
+        prev.map((p) => {
+          if (p.id === memberId) {
+            let newVotesCount = p.votesCount;
+
+            // Remove previous vote effect
+            if (currentVote === "upvote") {
+              newVotesCount -= 1;
+            } else if (currentVote === "downvote") {
+              newVotesCount += 1;
+            }
+
+            // Apply new vote effect
+            if (voteType === "upvote") {
+              newVotesCount += 1;
+            } else if (voteType === "downvote") {
+              newVotesCount -= 1;
+            }
+
+            return {
+              ...p,
+              votesCount: Math.max(0, newVotesCount),
+              votes: Math.max(0, newVotesCount).toLocaleString(),
+            };
+          }
+          return p;
+        })
+      );
+
+      // Update local storage
+      const newVoteState = { ...userVotes, [memberId]: voteType };
+      setUserVotes(newVoteState);
+      saveVoteState(newVoteState);
+
+      // Make API call
+      const endpoint = voteType === "upvote" ? "/api/upvote" : "/api/downvote";
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          member_id: politician.memberId,
+          ip: ip,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to ${voteType}`);
+      }
+
+      const data = await response.json();
+      toast.success(data.message || `Successfully ${voteType}d!`);
+    } catch (err: any) {
+      console.error(`Error ${voteType}ing:`, err);
+      toast.error(`Failed to ${voteType}. Please try again.`);
+
+      // Revert optimistic update on error
+      setPoliticians((prev) =>
+        prev.map((p) => {
+          if (p.id === memberId) {
+            let revertedCount = p.votesCount;
+
+            // Revert the vote change
+            if (voteType === "upvote") {
+              revertedCount -= 1;
+            } else if (voteType === "downvote") {
+              revertedCount += 1;
+            }
+
+            // Restore previous vote if existed
+            if (currentVote === "upvote") {
+              revertedCount += 1;
+            } else if (currentVote === "downvote") {
+              revertedCount -= 1;
+            }
+
+            return {
+              ...p,
+              votesCount: Math.max(0, revertedCount),
+              votes: Math.max(0, revertedCount).toLocaleString(),
+            };
+          }
+          return p;
+        })
+      );
+
+      // Revert vote state
+      setUserVotes(userVotes);
+      saveVoteState(userVotes);
+    }
+  };
+
   const filteredPoliticians = politicians.filter((p: Politician) => {
     if (filter === "all") return true;
     if (filter === "trending") return p.trending;
@@ -414,7 +604,7 @@ const Politicians = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen  from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 pt-16 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 pt-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto px-8">
           <div className="flex flex-col items-center justify-center min-h-[400px]">
             <Loader2 className="w-12 h-12 animate-spin text-primary" />
@@ -429,7 +619,7 @@ const Politicians = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen  from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 pt-16 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 pt-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto px-8">
           <div className="flex flex-col items-center justify-center min-h-[400px]">
             <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
@@ -440,27 +630,6 @@ const Politicians = () => {
               <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
                 {error}
               </p>
-              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800 text-left">
-                <p className="text-sm text-blue-800 dark:text-blue-200 mb-2">
-                  <strong>Setup Instructions:</strong>
-                </p>
-                <ol className="text-xs text-blue-700 dark:text-blue-300 space-y-1 list-decimal list-inside">
-                  <li>
-                    Sign up for a free API key at:{" "}
-                    <a
-                      href="https://api.congress.gov/sign-up/"
-                      target="_blank"
-                      className="underline"
-                    >
-                      api.congress.gov/sign-up
-                    </a>
-                  </li>
-                  <li>
-                    Replace YOUR_API_KEY_HERE in the code with your actual key
-                  </li>
-                  <li>The API allows 5,000 requests per hour</li>
-                </ol>
-              </div>
               <Button
                 onClick={fetchCongressMembers}
                 className="mt-4 rounded-none"
@@ -557,6 +726,8 @@ const Politicians = () => {
                   politician={politician}
                   isTopRanked={index === 0}
                   onOpenDialog={fetchMemberDetails}
+                  onVote={handleVote}
+                  userVote={userVotes[politician.id] || null}
                 />
               )
             )}
