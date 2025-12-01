@@ -48,10 +48,6 @@ const About = () => {
           <div className="">
             <Values />
           </div>
-          <div className="text-center fontroboto italic text-neutral-500">
-            ...Together, we can build a more informed, engaged, and united
-            society.
-          </div>
         </main>
       </div>
     </div>
