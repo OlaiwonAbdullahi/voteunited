@@ -38,7 +38,7 @@ const US_STATES = [
     name: "Connecticut",
     abbr: "CT",
     voteUrl:
-      "https://portal.ct.gov/SOTS/Election-Services/Voter-Information/Voter-Information",
+      "https://portal.ct.gov/SOTS/Election-Services/V5-Side-Navigation/ELE---Election-Information",
   },
   { name: "Delaware", abbr: "DE", voteUrl: "https://elections.delaware.gov/" },
   {
