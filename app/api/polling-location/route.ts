@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_CIVIC_API_KEY;
+    const apiKey = "AIzaSyCQpGVyZs7utzMX0cKchTMPCtU6pQmYtwk";
 
     if (!apiKey) {
       return NextResponse.json(
